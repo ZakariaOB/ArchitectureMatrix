@@ -1,0 +1,33 @@
+Database Initialization:
+--------------------------
+
+- Create and initialize the database and tables:
+   - The connection string is located in MachineMonitoring.WebAPI > appsettings.json using the key "GlobalSettings > MachineMonitoringConnection".
+   - Two initialization scripts are available in the "Scripts" database folder:
+      - InitDbScript.sql: Creates the main database used by the web API project.
+      - InitTestDbScript.sql: Creates the testing database used for integration testing to prevent interfering with the main app data during CRUD operations.
+      - The connection string for the testing project can be found in MachineMonitoring.WebAPI.Test > appSettings.json 
+      under (GlobalSettings > MachineMonitoringConnection)"and It uses the "MachineMonitoringTest" database.
+
+Web API:
+---------------------------
+- The application serves the Angular app using static files and should redirect to https://localhost:7076/ClientApp/index.html.
+- To check the API calls, please visit https://localhost:7076/swagger/index.html.
+
+Web API Unit Tests:
+--------------------------
+- Integration tests use a separate database, "MachineMonitoringTest," defined in the appSettings.json file of the testing project.
+- Unit tests mock the machine service.
+
+Exceptions:
+-------------------------
+- Global exceptions are handled using the ExceptionMiddleware in the web API and an error.interceptor in the Angular app.
+
+
+Front-end:
+-------------------------
+- The front end project is : machine-monitoring-client
+- The Angular app is bundled and served from static files (ClientApp) in the MachineMonitoring.WebAPI project.
+- Please use the refresh button to reload the page.
+- Known issue: The app always redirects to https://localhost:7076/ClientApp/ instead of https://localhost:7076/ClientApp/index.html when served from static files. 
+  This is likely due to the Angular routing system.
