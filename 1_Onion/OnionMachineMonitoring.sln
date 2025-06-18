@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnionMachineMonitoring.Domain", "OnionMachineMonitoring.Core\OnionMachineMonitoring.Domain.csproj", "{66D3A1B9-73E4-4F9B-BC96-C26EBC0B289E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnionMachineMonitoring.Application", "OnionMachineMonitoring.Application\OnionMachineMonitoring.Application.csproj", "{D3A2E32E-2208-4A60-A71F-087C1D18310F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnionMachineMonitoring.Infrastructure", "OnionMachineMonitoring.Infrastructure\OnionMachineMonitoring.Infrastructure.csproj", "{0D04BB1E-A16C-41A0-B559-B55487E894ED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnionMachineMonitoring.Shared", "OnionMachineMonitoring.Shared\OnionMachineMonitoring.Shared.csproj", "{7558CAFC-0C01-4BB7-8E4D-B20187C8EC89}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnionMachineMonitoring.Api", "OnionMachineMonitoring.Api\OnionMachineMonitoring.Api.csproj", "{FE385102-B378-4B10-808C-8EBD8BC3DC93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnionMachineMonitoring.Tests", "OnionMachineMonitoring.Tests\OnionMachineMonitoring.Tests.csproj", "{EA85BBE4-563C-4D63-8F8E-5A09E6F363E4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{66D3A1B9-73E4-4F9B-BC96-C26EBC0B289E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66D3A1B9-73E4-4F9B-BC96-C26EBC0B289E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66D3A1B9-73E4-4F9B-BC96-C26EBC0B289E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66D3A1B9-73E4-4F9B-BC96-C26EBC0B289E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3A2E32E-2208-4A60-A71F-087C1D18310F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3A2E32E-2208-4A60-A71F-087C1D18310F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3A2E32E-2208-4A60-A71F-087C1D18310F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3A2E32E-2208-4A60-A71F-087C1D18310F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D04BB1E-A16C-41A0-B559-B55487E894ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D04BB1E-A16C-41A0-B559-B55487E894ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D04BB1E-A16C-41A0-B559-B55487E894ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D04BB1E-A16C-41A0-B559-B55487E894ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7558CAFC-0C01-4BB7-8E4D-B20187C8EC89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7558CAFC-0C01-4BB7-8E4D-B20187C8EC89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7558CAFC-0C01-4BB7-8E4D-B20187C8EC89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7558CAFC-0C01-4BB7-8E4D-B20187C8EC89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE385102-B378-4B10-808C-8EBD8BC3DC93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE385102-B378-4B10-808C-8EBD8BC3DC93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE385102-B378-4B10-808C-8EBD8BC3DC93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE385102-B378-4B10-808C-8EBD8BC3DC93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA85BBE4-563C-4D63-8F8E-5A09E6F363E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA85BBE4-563C-4D63-8F8E-5A09E6F363E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA85BBE4-563C-4D63-8F8E-5A09E6F363E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA85BBE4-563C-4D63-8F8E-5A09E6F363E4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
