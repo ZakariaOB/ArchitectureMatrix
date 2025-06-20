@@ -19,12 +19,14 @@ public class Machine
         Description = description;
     }
 
-    public void AddProduction(int totalProduction)
+    public void AddProduction(int totalProduction, DateTime createdDate)
     {
         if (totalProduction < 0)
+        {
             throw new ArgumentException("Production must be positive", nameof(totalProduction));
+        }
 
-        _productions.Add(new MachineProduction(this, totalProduction));
+        _productions.Add(new MachineProduction(this, totalProduction, createdDate));
     }
 
     public int GetTotalProduction() => _productions.Sum(p => p.TotalProduction);
@@ -35,5 +37,11 @@ public class Machine
             throw new ArgumentException("Name cannot be empty", nameof(newName));
 
         Name = newName;
+    }
+
+    public void EnsureCanBeDeleted(DateTime now)
+    {
+        if (_productions.Any(p => p.CreatedAt >= now.AddDays(-30)))
+            throw new DomainException("Machine has recent production within 30 days");
     }
 }

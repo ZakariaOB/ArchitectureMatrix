@@ -11,10 +11,13 @@ public class MachineProduction
     // Required by EF
     private MachineProduction() { }
 
-    public MachineProduction(Machine machine, int totalProduction)
+    public DateTime CreatedAt { get; set; }
+
+    public MachineProduction(Machine machine, int totalProduction, DateTime createdDate)
     {
         Machine = machine ?? throw new ArgumentNullException(nameof(machine));
         MachineId = machine.Id;
+        CreatedAt = createdDate;
         TotalProduction = totalProduction > 0
             ? totalProduction
             : throw new ArgumentException("Production must be positive", nameof(totalProduction));

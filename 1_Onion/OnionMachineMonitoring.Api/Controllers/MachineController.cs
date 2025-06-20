@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MachineMonitoring.Shared.Enums;
+using Microsoft.AspNetCore.Mvc;
 using OnionMachineMonitoring.Application.Services;
 
 namespace OnionMachineMonitoring.WebAPI.Controllers;
@@ -49,5 +50,19 @@ public class MachineController : ControllerBase
     {
         await _machineService.DeleteAsync(id);
         return Ok();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var result = await _machineService.DeleteIfAllowedAsync(id);
+
+        return result switch
+        {
+            EntityDeleteResult.Deleted => Ok(),
+            EntityDeleteResult.Forbidden => Forbid("Machine has recent production."),
+            EntityDeleteResult.NotFound => NotFound(),
+            _ => StatusCode(500)
+        };
     }
 }

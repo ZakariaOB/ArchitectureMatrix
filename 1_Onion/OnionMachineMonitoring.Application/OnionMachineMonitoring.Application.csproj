@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OnionMachineMonitoring.Core\OnionMachineMonitoring.Domain.csproj" />
+    <ProjectReference Include="..\OnionMachineMonitoring.Shared\OnionMachineMonitoring.Shared.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

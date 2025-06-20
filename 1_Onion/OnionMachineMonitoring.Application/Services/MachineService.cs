@@ -1,4 +1,5 @@
-﻿using OnionMachineMonitoring.Application.Interfaces;
+﻿using MachineMonitoring.Shared.Enums;
+using OnionMachineMonitoring.Application.Interfaces;
 using OnionMachineMonitoring.Core.Entities;
 using OnionMachineMonitoring.Core.Interfaces;
 
@@ -34,4 +35,23 @@ public class MachineService : IMachineService
 
     public Task DeleteAsync(int id, CancellationToken cancellationToken = default)
         => _machineRepository.DeleteAsync(id, cancellationToken);
+
+    public async Task<EntityDeleteResult> DeleteIfAllowedAsync(int id)
+    {
+        var machine = await _machineRepository.GetByIdAsync(id);
+        if (machine == null)
+            return EntityDeleteResult.NotFound;
+
+        try
+        {
+            machine.EnsureCanBeDeleted(DateTime.UtcNow); // ✅ Domain rule enforced
+        }
+        catch (Exception)
+        {
+            return EntityDeleteResult.Forbidden;
+        }
+
+        await _machineRepository.DeleteAsync(machine.Id); // commit handled internally
+        return EntityDeleteResult.Deleted;
+    }
 }
