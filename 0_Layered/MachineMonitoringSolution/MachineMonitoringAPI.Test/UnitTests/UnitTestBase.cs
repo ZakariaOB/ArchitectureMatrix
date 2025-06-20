@@ -22,7 +22,7 @@ namespace MachineMonitoring.WebAPI.Test.UnitTests
                 config.AddProfile(new MachineApiProfile());
             });
             _mapper = mappingConfig.CreateMapper();
-            _controller = new MachineApiController(_machineServiceMock.Object, _mapper);
+            _controller = new MachineApiController(_machineServiceMock.Object, _mapper, null);
         }
     }
 }

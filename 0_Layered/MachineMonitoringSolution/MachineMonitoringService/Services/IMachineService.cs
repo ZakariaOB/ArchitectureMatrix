@@ -10,5 +10,7 @@ namespace MachineMonitoringService.Services
         Task<MachineDto> GetByIdAsync(int id);
 
         Task<EntityDeleteResult> Delete(int id);
+
+        Task<EntityDeleteResult> DeleteIfAllowedAsync(int id);
     }
 }

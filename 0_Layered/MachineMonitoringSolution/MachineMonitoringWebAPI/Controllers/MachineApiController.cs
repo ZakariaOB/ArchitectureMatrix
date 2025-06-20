@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MachineMonitoring.Repository.DataContext;
 using MachineMonitoring.Shared.Enums;
 using MachineMonitoring.Shared.Extensions;
 using MachineMonitoring.WebAPI.Models;
@@ -7,6 +8,7 @@ using MachineMonitoringService.Services;
 using MachineMonitoringWebAPI.Constants;
 using MachineMonitoringWebAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace MachineMonitoringWebAPI.Controllers
 {
@@ -17,10 +19,17 @@ namespace MachineMonitoringWebAPI.Controllers
 
         private readonly IMapper _mapper;
 
-        public MachineApiController(IMachineService machineService, IMapper mapper)
+        private readonly MachineMonitoringContext machineMonitoringContext;
+
+
+        public MachineApiController(
+            IMachineService machineService, 
+            IMapper mapper,
+            MachineMonitoringContext machineMonitoringContext)
         {
             _machineService = machineService;
             _mapper = mapper;
+            this.machineMonitoringContext = machineMonitoringContext;
         }
 
         [HttpGet(ApiRoutes.Machines.GetAll)]
@@ -88,6 +97,30 @@ namespace MachineMonitoringWebAPI.Controllers
             }
             MachineForDashboardModel machineModel = _mapper.Map<MachineForDashboardModel>(machineDto);
             return Ok(machineModel);
+        }
+
+        [HttpDelete("machine/delet-out-prodcution")]
+        public async Task<IActionResult> DeleteMachineWithRecentProduction(int id)
+        {
+            var machine = await machineMonitoringContext.Machines
+                .Include(m => m.MachineProductions)
+                .FirstOrDefaultAsync(m => m.MachineId == id);
+
+            if (machine == null)
+                return NotFound();
+
+            var now = DateTime.UtcNow;
+            var hasRecentProduction = machine.MachineProductions.Any(p => p.CreatedAt >= now.AddDays(-30));
+
+            if (hasRecentProduction)
+            {
+                return Forbid();
+            }
+
+            machineMonitoringContext.Machines.Remove(machine);
+            await machineMonitoringContext.SaveChangesAsync();
+
+            return Ok();
         }
     }
 }

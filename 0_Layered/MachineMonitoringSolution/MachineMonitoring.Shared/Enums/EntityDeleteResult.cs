@@ -3,6 +3,8 @@
     public enum EntityDeleteResult
     {
         NoDeletion = 0,
-        Deleted = 1
+        Deleted = 1,
+        NotFound = 2,
+        Forbidden = 3,
     }
 }
