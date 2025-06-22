@@ -5,11 +5,11 @@ using OnionMachineMonitoring.Infrastructure.Persistence;
 
 namespace OnionMachineMonitoring.Infrastructure.Repositories;
 
-public class MachineRepository : IMachineRepository
+public class MachineEfRepository : IMachineRepository
 {
     private readonly MachineDbContext _context;
 
-    public MachineRepository(MachineDbContext context)
+    public MachineEfRepository(MachineDbContext context)
     {
         _context = context;
     }

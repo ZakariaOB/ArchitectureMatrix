@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OnionMachineMonitoring.Application\OnionMachineMonitoring.Application.csproj" />
     <ProjectReference Include="..\OnionMachineMonitoring.Core\OnionMachineMonitoring.Domain.csproj" />
+    <ProjectReference Include="..\OnionMachineMonitoring.Infrastructure\OnionMachineMonitoring.Infrastructure.csproj" />
     <ProjectReference Include="..\OnionMachineMonitoring.Shared\OnionMachineMonitoring.Shared.csproj" />
   </ItemGroup>
 

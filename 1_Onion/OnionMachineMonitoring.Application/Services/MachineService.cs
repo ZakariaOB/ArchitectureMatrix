@@ -2,12 +2,14 @@
 using OnionMachineMonitoring.Application.Interfaces;
 using OnionMachineMonitoring.Core.Entities;
 using OnionMachineMonitoring.Core.Interfaces;
+using System.Net.Http.Json;
 
 namespace OnionMachineMonitoring.Application.Services;
 
 public class MachineService : IMachineService
 {
     private readonly IMachineRepository _machineRepository;
+    private readonly HttpClient _httpClient;
 
     public MachineService(IMachineRepository machineRepository)
     {
@@ -44,7 +46,7 @@ public class MachineService : IMachineService
 
         try
         {
-            machine.EnsureCanBeDeleted(DateTime.UtcNow); // ✅ Domain rule enforced
+            machine.EnsureCanBeDeleted(DateTime.UtcNow); // Domain rule enforced
         }
         catch (Exception)
         {
@@ -53,5 +55,20 @@ public class MachineService : IMachineService
 
         await _machineRepository.DeleteAsync(machine.Id); // commit handled internally
         return EntityDeleteResult.Deleted;
+    }
+
+    public async Task<IEnumerable<Machine>> GetMachinesAsync(string source = "db")
+    {
+        if (source == "db")
+        {
+            return await _machineRepository.GetAllAsync(default); // tightly coupled
+        }
+        else if (source == "http")
+        {
+            var response = await _httpClient.GetFromJsonAsync<List<Machine>>("https://external/api/machines");
+            return response;
+        }
+
+        throw new NotSupportedException("Unknown source");
     }
 }

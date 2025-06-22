@@ -1,0 +1,30 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="CleanArchitecture.nuspec" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/MachineMonitoring.Clean.AspireHost/MachineMonitoring.Clean.AspireHost.csproj" />
+    <Project Path="src/MachineMonitoring.Clean.Core/MachineMonitoring.Clean.Core.csproj" />
+    <Project Path="src/MachineMonitoring.Clean.Infrastructure/MachineMonitoring.Clean.Infrastructure.csproj" />
+    <Project Path="src/MachineMonitoring.Clean.ServiceDefaults/MachineMonitoring.Clean.ServiceDefaults.csproj" />
+    <Project Path="src/MachineMonitoring.Clean.UseCases/MachineMonitoring.Clean.UseCases.csproj" />
+    <Project Path="src/MachineMonitoring.Clean.Web/MachineMonitoring.Clean.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MachineMonitoring.Clean.FunctionalTests/MachineMonitoring.Clean.FunctionalTests.csproj">
+      <BuildDependency Project="src/MachineMonitoring.Clean.Web/MachineMonitoring.Clean.Web.csproj" />
+    </Project>
+    <Project Path="tests/MachineMonitoring.Clean.IntegrationTests/MachineMonitoring.Clean.IntegrationTests.csproj">
+      <BuildDependency Project="src/MachineMonitoring.Clean.Infrastructure/MachineMonitoring.Clean.Infrastructure.csproj" />
+    </Project>
+    <Project Path="tests/MachineMonitoring.Clean.UnitTests/MachineMonitoring.Clean.UnitTests.csproj" />
+  </Folder>
+</Solution>
