@@ -58,6 +58,7 @@ namespace MachineMonitoringService.Services
                 return EntityDeleteResult.Forbidden;
 
             await _machineRepository.Delete(id);
+
             return EntityDeleteResult.Deleted;
         }
     }

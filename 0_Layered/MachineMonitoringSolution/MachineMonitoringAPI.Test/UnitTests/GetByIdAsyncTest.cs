@@ -1,5 +1,4 @@
-﻿using MachineMonitoring.WebAPI.Models;
-using MachineMonitoringService.Dto;
+﻿using MachineMonitoringService.Dto;
 using MachineMonitoringWebAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
