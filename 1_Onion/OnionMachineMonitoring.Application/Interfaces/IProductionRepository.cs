@@ -10,6 +10,10 @@ namespace OnionMachineMonitoring.Domain.Interfaces
             DateTime toUtc, 
             CancellationToken ct);
         
-        Task UpsertRangeAsync(IEnumerable<MachineProduction> items, CancellationToken ct);
+        Task UpsertRangeAsync(IEnumerable<MachineProduction> items);
+
+        Task<IReadOnlyList<MachineProduction>> FetchAsync(object range);
+
+        Task UpsertAsync(IReadOnlyList<MachineProduction> items);
     }
 }
