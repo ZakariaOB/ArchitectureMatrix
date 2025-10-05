@@ -1,7 +1,4 @@
-﻿using MachineMonitoring.Application;
-using MachineMonitoring.Domain;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using OnionMachineMonitoring.Core.Entities;
+﻿using OnionMachineMonitoring.Core.Entities;
 using OnionMachineMonitoring.Domain.Interfaces;
 
 namespace MachineMonitoring.Infrastructure;

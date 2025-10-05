@@ -27,13 +27,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnionMachineMonitoring.Api"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnionMachineMonitoring.Tests", "1_Onion\OnionMachineMonitoring.Tests\OnionMachineMonitoring.Tests.csproj", "{C025B1A2-9517-44A8-9FF2-2B32E2DE7787}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2_Hexagonal", "2_Hexagonal", "{9240D36D-88A9-41F8-8C0A-E846825A468C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexagonalMachineMonitoring.Core", "2_Hexagonal\HexagonalMachineMonitoring.Core\HexagonalMachineMonitoring.Core.csproj", "{A71EDA09-E54C-4AB9-AA6F-E484E9C4B08C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexagonalMachineMonitoring.Adapters", "2_Hexagonal\HexagonalMachineMonitoring.Adapters\HexagonalMachineMonitoring.Adapters.csproj", "{7749C518-3040-4F55-AA66-C7DAD6E7D182}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexagonalMachineMonitoring.Api", "2_Hexagonal\HexagonalMachineMonitoring.Api\HexagonalMachineMonitoring.Api.csproj", "{C6558A57-1091-4859-AD74-E0777F1E29D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C60C7A2D-492A-4E23-9B31-0F8658ACD5B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -72,6 +77,21 @@ Global
 		{C025B1A2-9517-44A8-9FF2-2B32E2DE7787}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C025B1A2-9517-44A8-9FF2-2B32E2DE7787}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C025B1A2-9517-44A8-9FF2-2B32E2DE7787}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A71EDA09-E54C-4AB9-AA6F-E484E9C4B08C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A71EDA09-E54C-4AB9-AA6F-E484E9C4B08C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A71EDA09-E54C-4AB9-AA6F-E484E9C4B08C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A71EDA09-E54C-4AB9-AA6F-E484E9C4B08C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7749C518-3040-4F55-AA66-C7DAD6E7D182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7749C518-3040-4F55-AA66-C7DAD6E7D182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7749C518-3040-4F55-AA66-C7DAD6E7D182}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7749C518-3040-4F55-AA66-C7DAD6E7D182}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6558A57-1091-4859-AD74-E0777F1E29D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6558A57-1091-4859-AD74-E0777F1E29D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6558A57-1091-4859-AD74-E0777F1E29D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6558A57-1091-4859-AD74-E0777F1E29D6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D88383A3-FC08-429A-B0DA-7A15F3C30F09} = {569B6BEE-7BD8-492B-B636-17B4771A2A3A}
@@ -84,5 +104,8 @@ Global
 		{862F1875-49D7-4CD3-8D10-33C01CB94852} = {A3917E5F-C7B0-485A-AF3C-5585D3627567}
 		{3249CFEC-116F-419B-9805-A29048FF4D05} = {A3917E5F-C7B0-485A-AF3C-5585D3627567}
 		{C025B1A2-9517-44A8-9FF2-2B32E2DE7787} = {A3917E5F-C7B0-485A-AF3C-5585D3627567}
+		{A71EDA09-E54C-4AB9-AA6F-E484E9C4B08C} = {9240D36D-88A9-41F8-8C0A-E846825A468C}
+		{7749C518-3040-4F55-AA66-C7DAD6E7D182} = {9240D36D-88A9-41F8-8C0A-E846825A468C}
+		{C6558A57-1091-4859-AD74-E0777F1E29D6} = {9240D36D-88A9-41F8-8C0A-E846825A468C}
 	EndGlobalSection
 EndGlobal
