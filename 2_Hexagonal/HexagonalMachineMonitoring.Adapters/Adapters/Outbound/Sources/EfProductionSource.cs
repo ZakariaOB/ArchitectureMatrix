@@ -6,8 +6,8 @@ namespace ArchitectureMatrix.HexagonalMachineMonitoring.Adapters.Outbound.Source
 public sealed class EfProductionSource : IProductionSource
 {
     public Task<IReadOnlyList<MachineProduction>> LoadAsync(string machineId, DateTime fromUtc, DateTime toUtc, CancellationToken ct)
-        => Task.FromResult<IReadOnlyList<MachineProduction>>(new[]
-        {
+        => Task.FromResult<IReadOnlyList<MachineProduction>>(
+        [
             new MachineProduction(machineId, fromUtc.AddHours(1), fromUtc.AddHours(2), 100)
-        });
+        ]);
 }

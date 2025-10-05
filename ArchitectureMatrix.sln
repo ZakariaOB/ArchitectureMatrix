@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexagonalMachineMonitoring.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexagonalMachineMonitoring.Api", "2_Hexagonal\HexagonalMachineMonitoring.Api\HexagonalMachineMonitoring.Api.csproj", "{C6558A57-1091-4859-AD74-E0777F1E29D6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3_Clean", "3_Clean", "{91F410FC-4AE8-438B-B90B-4F11E560AD57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
