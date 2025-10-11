@@ -20,6 +20,8 @@ ArchitectureMatrix.sln
 dotnet build ArchitectureMatrix.sln
 dotnet run --project 2_Hexagonal/HexagonalMachineMonitoring.Api/HexagonalMachineMonitoring.Api.csproj
 ```
+> **Note:** The automated Codex environment this repository ships with does not have the .NET SDK installed, so the `dotnet` commands above will fail there. To verify the solution compiles, run them on a machine with the [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download) installed (for example your local workstation or a CI agent).
+
 Swagger exposes **POST /hex/sync**. Configure inputs in `2_Hexagonal/HexagonalMachineMonitoring.Api/appsettings.json`:
 ```json
 { "Hex": { "Sources": ["Ef", "Http", "Csv"] } }
