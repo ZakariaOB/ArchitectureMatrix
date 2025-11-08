@@ -14,6 +14,9 @@ namespace MachineMonitoring.Repository.DataContext
         public virtual DbSet<Machine> Machines { get; set; } = null!;
         public virtual DbSet<MachineProduction> MachineProductions { get; set; } = null!;
 
+        public virtual DbSet<MaintenanceTask> MaintenanceTasks { get; set; } = null!;
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(
