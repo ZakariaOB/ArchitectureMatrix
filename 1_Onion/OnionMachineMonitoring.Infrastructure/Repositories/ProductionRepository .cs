@@ -11,6 +11,11 @@ public class ProductionRepository : IProductionRepository
     private readonly MachineDbContext _db;
     public ProductionRepository(MachineDbContext db) => _db = db;
 
+    public Task<IReadOnlyList<MachineProduction>> FetchAsync(object range)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<IReadOnlyList<MachineProduction>> GetByMachineAndRangeAsync(
         int machineId, 
         DateTime fromUtc, 
@@ -23,6 +28,11 @@ public class ProductionRepository : IProductionRepository
             .ToListAsync(ct);
 
         return rows;
+    }
+
+    public Task UpsertAsync(IReadOnlyList<MachineProduction> items)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task UpsertRangeAsync(IEnumerable<MachineProduction> items, CancellationToken ct)
@@ -46,6 +56,11 @@ public class ProductionRepository : IProductionRepository
             }*/
         }
         await _db.SaveChangesAsync(ct);
+    }
+
+    public Task UpsertRangeAsync(IEnumerable<MachineProduction> items)
+    {
+        throw new NotImplementedException();
     }
 
     /*

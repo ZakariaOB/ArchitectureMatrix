@@ -52,4 +52,14 @@ public class MachineEfRepository : IMachineRepository
             await _context.SaveChangesAsync(cancellationToken);
         }
     }
+
+    public IEnumerable<Machine> GetAllMachines() => [.. _context.Machines.AsNoTracking()];
+
+    public IEnumerable<Machine> GetMachinesByPrefix(char prefix)
+    {
+        // Deferred execution happens inside EF
+        return [.. _context.Machines
+                       .Where(m => m.Name.StartsWith(prefix))
+                       .AsNoTracking()]; // EF translates to SQL before returning
+    }
 }

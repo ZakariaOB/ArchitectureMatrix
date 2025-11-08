@@ -12,20 +12,6 @@ var repoType = builder.Configuration["RepositoryType"]?.ToLowerInvariant();
 
 switch (repoType)
 {
-    case "http":
-        builder.Services.AddHttpClient<IMachineRepository, HttpMachineRepository>(client =>
-        {
-            client.BaseAddress = new Uri(builder.Configuration["HttpApiBaseUrl"]);
-        });
-        break;
-
-    case "csv":
-        builder.Services.AddScoped<IMachineRepository>(provider =>
-        {
-            var path = builder.Configuration["CsvPath"];
-            return new CsvMachineRepository(path);
-        });
-        break;
 
     case "ef":
     default:

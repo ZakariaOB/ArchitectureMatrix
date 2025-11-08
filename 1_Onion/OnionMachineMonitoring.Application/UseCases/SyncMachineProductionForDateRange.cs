@@ -23,7 +23,7 @@ public sealed class SyncMachineProductionForDateRange
 
     public async Task ExecuteAsync(Guid machineId, DateTime fromUtc, DateTime toUtc, IEnumerable<MachineProduction> incoming, CancellationToken ct)
     {
-        await _repo.UpsertRangeAsync(incoming, ct);
+        await _repo.UpsertRangeAsync([]);
         await _events.PublishAsync(new SyncCompleted(machineId, fromUtc, toUtc, DateTime.UtcNow), ct);
     }
 

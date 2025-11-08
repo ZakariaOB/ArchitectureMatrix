@@ -9,4 +9,8 @@ public interface IMachineRepository
     Task AddAsync(Machine machine, CancellationToken cancellationToken = default);
     Task UpdateAsync(Machine machine, CancellationToken cancellationToken = default);
     Task DeleteAsync(int id, CancellationToken cancellationToken = default);
+
+    IEnumerable<Machine> GetAllMachines();
+
+    IEnumerable<Machine> GetMachinesByPrefix(char prefix);
 }

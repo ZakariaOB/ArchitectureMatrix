@@ -3,14 +3,14 @@
 public class Machine
 {
     public int Id { get; private set; }
-    public string Name { get; private set; }
+    public string Name { get; set; }
     public string? Description { get; private set; }
 
     private readonly List<MachineProduction> _productions = new();
     public IReadOnlyCollection<MachineProduction> Productions => _productions.AsReadOnly();
 
     // Required by EF Core
-    private Machine() { }
+    public Machine() { }
 
     public Machine(int id, string name, string? description = null)
     {
@@ -26,7 +26,7 @@ public class Machine
             throw new ArgumentException("Production must be positive", nameof(totalProduction));
         }
 
-        _productions.Add(new MachineProduction(this, totalProduction, createdDate));
+        _productions.Add(new MachineProduction(this, totalProduction, createdDate, DateTime.Now, 1));
     }
 
     public int GetTotalProduction() => _productions.Sum(p => p.TotalProduction);

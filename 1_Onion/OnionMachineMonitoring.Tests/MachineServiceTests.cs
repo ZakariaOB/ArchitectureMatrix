@@ -1,8 +1,12 @@
-﻿using MachineMonitoring.Shared.Enums;
+﻿using ArchitectureMatrix.DependencyInversion.Onion_IEnumerableFix.Infrastructure;
+using MachineMonitoring.Shared.Enums;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using OnionMachineMonitoring.Application.Services;
 using OnionMachineMonitoring.Core.Entities;
 using OnionMachineMonitoring.Core.Interfaces;
+using OnionMachineMonitoring.Infrastructure.Persistence;
+using OnionMachineMonitoring.Infrastructure.Repositories;
 
 namespace OnionMachineMonitoring.Tests
 {
@@ -59,6 +63,48 @@ namespace OnionMachineMonitoring.Tests
             var result = await service.DeleteIfAllowedAsync(999);
 
             Assert.Equal(EntityDeleteResult.NotFound, result);
+        }
+
+        private static MachineDbContext CreateInMemoryContext()
+        {
+            var options = new DbContextOptionsBuilder<MachineDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            var context = new MachineDbContext(options);
+            context.Machines.AddRange(
+                new Machine { Name = "Cutter" },
+                new Machine { Name = "Printer" },
+                new Machine { Name = "Folder" }
+            );
+            context.SaveChanges();
+
+            return context;
+        }
+
+        [Fact]
+        public void EfRepository_Should_Execute_Query_InDatabase_But_Domain_Stays_Pure()
+        {
+            var context = CreateInMemoryContext();
+            var repo = new MachineEfRepository(context);
+            var service = new MachineService(repo);
+
+            var result = service.GetMachineNamesStartingWith('C');
+
+            Assert.Contains("Cutter", result);
+        }
+
+        [Fact]
+        public void ApiRepository_Should_Behave_Exactly_The_Same()
+        {
+            var context = CreateInMemoryContext();
+            var machines = context.Machines.ToList();
+            var repo = new ApiMachineRepository(machines);
+            var service = new MachineService(repo);
+
+            var result = service.GetMachineNamesStartingWith('C');
+
+            Assert.Contains("Cutter", result);
         }
     }
 }

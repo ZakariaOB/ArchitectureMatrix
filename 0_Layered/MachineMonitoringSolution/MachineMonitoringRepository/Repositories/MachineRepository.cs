@@ -9,6 +9,13 @@ namespace MachineMonitoringRepository.Repositories
     {
         private readonly MachineMonitoringContext _dbContext;
 
+        private readonly List<Machine> _machines =
+        [
+            new() { Name = "Cutter" },
+            new() { Name = "Printer" },
+            new() { Name = "Folder" }
+        ];
+
         public MachineRepository(MachineMonitoringContext dbContext)
         {
             _dbContext = dbContext;
@@ -46,5 +53,7 @@ namespace MachineMonitoringRepository.Repositories
             _dbContext.Set<Machine>().Remove(machineToDelete);
             return _dbContext.SaveChanges() > 0 ? EntityDeleteResult.Deleted: EntityDeleteResult.NoDeletion;
         }
+
+        public IQueryable<Machine> GetAllMachines() => _dbContext.Machines;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using MachineMonitoring.Application;
-using MachineMonitoring.Domain;
 
 namespace MachineMonitoring.Infrastructure;
 

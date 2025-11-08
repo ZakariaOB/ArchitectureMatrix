@@ -71,4 +71,8 @@ public class MachineService : IMachineService
 
         throw new NotSupportedException("Unknown source");
     }
+
+    public IEnumerable<string> GetMachineNamesStartingWith(char prefix)
+        => _machineRepository.GetMachinesByPrefix(prefix).Select(m => m.Name);
 }
+    

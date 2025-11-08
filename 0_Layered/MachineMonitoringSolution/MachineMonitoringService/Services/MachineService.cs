@@ -4,6 +4,7 @@ using MachineMonitoring.Shared.Enums;
 using MachineMonitoringRepository.Models;
 using MachineMonitoringRepository.Repositories;
 using MachineMonitoringService.Dto;
+using Microsoft.EntityFrameworkCore;
 
 namespace MachineMonitoringService.Services
 {
@@ -18,10 +19,10 @@ namespace MachineMonitoringService.Services
         public MachineService(
             IMachineRepository machineRepository,
             IMapper mapper,
-            MachineMonitoringContext dbContext) 
+            MachineMonitoringContext dbContext)
         {
             _machineRepository = machineRepository;
-            _mapper  = mapper;
+            _mapper = mapper;
             machineMonitoringContext = dbContext;
         }
 
@@ -61,5 +62,14 @@ namespace MachineMonitoringService.Services
 
             return EntityDeleteResult.Deleted;
         }
+
+        public IEnumerable<string> GetMachineNamesStartingWith(char prefix)
+        {
+            // EF.Functions.Like() only works with EF LINQ provider
+            return [.. _machineRepository.GetAllMachines()
+                        .Where(m => EF.Functions.Like(m.Name, $"{prefix}%"))
+                        .Select(m => m.Name)];
+        }
+
     }
 }
