@@ -1,5 +1,5 @@
 using ArchitectureMatrix.HexagonalMachineMonitoring.Core.Ports.Inbound;
-using ArchitectureMatrix.HexagonalMachineMonitoring.Adapters.Composition;
+using HexagonalMachineMonitoring.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,5 +20,14 @@ app.MapPost("/hex/sync", async (ISyncProductionUseCase useCase, string machineId
 })
 .WithName("SyncProduction")
 .WithOpenApi();
+
+
+app.MapGet("/monitor/{machineId}", async (
+    int machineId,
+    TemperatureMonitoringService service) =>
+{
+    var reading = await service.MonitorAsync(machineId);
+    return Results.Ok(reading);
+});
 
 app.Run();

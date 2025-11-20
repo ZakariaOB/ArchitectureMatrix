@@ -1,14 +1,43 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11201.2
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexagonalMachineMonitoring.Adapters", "HexagonalMachineMonitoring.Adapters\HexagonalMachineMonitoring.Adapters.csproj", "{F582BF84-065B-95A2-930A-35AC95D6C022}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexagonalMachineMonitoring.Api", "HexagonalMachineMonitoring.Api\HexagonalMachineMonitoring.Api.csproj", "{0569E74F-6736-8D2B-D757-E87174891E0C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexagonalMachineMonitoring.Core", "HexagonalMachineMonitoring.Core\HexagonalMachineMonitoring.Core.csproj", "{2388EE3C-81FD-F5CE-1087-84F701D36229}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HexagonalMachineMonitoring.Tests", "HexagonalMachineMonitoring.Tests\HexagonalMachineMonitoring.Tests.csproj", "{F134632B-86AE-477F-AEFE-861511C4D77B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F582BF84-065B-95A2-930A-35AC95D6C022}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F582BF84-065B-95A2-930A-35AC95D6C022}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F582BF84-065B-95A2-930A-35AC95D6C022}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F582BF84-065B-95A2-930A-35AC95D6C022}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0569E74F-6736-8D2B-D757-E87174891E0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0569E74F-6736-8D2B-D757-E87174891E0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0569E74F-6736-8D2B-D757-E87174891E0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0569E74F-6736-8D2B-D757-E87174891E0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2388EE3C-81FD-F5CE-1087-84F701D36229}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2388EE3C-81FD-F5CE-1087-84F701D36229}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2388EE3C-81FD-F5CE-1087-84F701D36229}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2388EE3C-81FD-F5CE-1087-84F701D36229}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F134632B-86AE-477F-AEFE-861511C4D77B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F134632B-86AE-477F-AEFE-861511C4D77B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F134632B-86AE-477F-AEFE-861511C4D77B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F134632B-86AE-477F-AEFE-861511C4D77B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {85727AF8-8371-4E63-8C87-33B5F92D9C51}
 	EndGlobalSection
 EndGlobal

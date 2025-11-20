@@ -8,10 +8,11 @@ using ArchitectureMatrix.HexagonalMachineMonitoring.Core.UseCases;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ArchitectureMatrix.HexagonalMachineMonitoring.Adapters.Composition;
-
+/*
 public static class HexagonalRegistration
 {
-    public static IServiceCollection AddHexagonalProductionSync(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddHexagonalProductionSync(
+        this IServiceCollection services, IConfiguration config)
     {
         // Sources selected via config array: "Ef", "Http", "Csv"
         var enabled = config.GetSection("Hex:Sources").Get<string[]>() ?? Array.Empty<string>();
@@ -32,3 +33,4 @@ public static class HexagonalRegistration
         return services;
     }
 }
+*/
