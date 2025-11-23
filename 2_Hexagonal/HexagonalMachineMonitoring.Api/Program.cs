@@ -1,4 +1,9 @@
 using ArchitectureMatrix.HexagonalMachineMonitoring.Core.Ports.Inbound;
+using HexagonalMachineMonitoring.Adapters.Adapters.Inbound;
+using HexagonalMachineMonitoring.Adapters.Adapters.Outbound;
+using HexagonalMachineMonitoring.Api.Extensions;
+using HexagonalMachineMonitoring.Core.Ports.Inbound;
+using HexagonalMachineMonitoring.Core.Ports.Outbound;
 using HexagonalMachineMonitoring.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,8 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Register hexagonal ports/adapters using config
-// builder.Services.AddHexagonalProductionSync(builder.Configuration);
+builder.Services.AddMachineMonitoring();
 
 var app = builder.Build();
 app.UseSwagger();
