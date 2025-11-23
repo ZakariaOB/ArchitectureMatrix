@@ -2,7 +2,7 @@
 using ArchitectureMatrix.HexagonalMachineMonitoring.Core.Ports.Inbound;
 using ArchitectureMatrix.HexagonalMachineMonitoring.Core.Ports.Outbound;
 
-namespace ArchitectureMatrix.HexagonalMachineMonitoring.Core.UseCases;
+namespace HexagonalMachineMonitoring.Core.UseCases;
 
 /// <summary>
 /// Pull from all sources -> normalize via policy -> save -> publish event.

@@ -1,7 +1,9 @@
 using ArchitectureMatrix.HexagonalMachineMonitoring.Core.Ports.Inbound;
 using HexagonalMachineMonitoring.Adapters.Adapters.Inbound;
 using HexagonalMachineMonitoring.Adapters.Adapters.Outbound;
+using HexagonalMachineMonitoring.Api.Contracts;
 using HexagonalMachineMonitoring.Api.Extensions;
+using HexagonalMachineMonitoring.Core.Domain.Models;
 using HexagonalMachineMonitoring.Core.Ports.Inbound;
 using HexagonalMachineMonitoring.Core.Ports.Outbound;
 using HexagonalMachineMonitoring.Core.Services;
@@ -32,6 +34,19 @@ app.MapGet("/monitor/{machineId}", async (
 {
     var reading = await service.MonitorAsync(machineId);
     return Results.Ok(reading);
+});
+
+app.MapPost("/api/telemetry", async (TelemetryReadingDto dto, IIngestTelemetryUseCase useCase, CancellationToken ct) =>
+{
+    var reading = new TelemetryReading(
+        dto.MachineId,
+        dto.TemperatureCelsius,
+        dto.LoadPercentage,
+        dto.TimestampUtc);
+
+    await useCase.HandleAsync(reading, ct);
+
+    return Results.Accepted();
 });
 
 app.Run();
