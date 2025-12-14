@@ -1,0 +1,33 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".template.config/template.json" />
+    <File Path="CleanArchitecture.nuspec" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/MachineMonitoringClean10.Core/MachineMonitoringClean10.Core.csproj" />
+    <Project Path="src/MachineMonitoringClean10.Infrastructure/MachineMonitoringClean10.Infrastructure.csproj" />
+    <Project Path="src/MachineMonitoringClean10.UseCases/MachineMonitoringClean10.UseCases.csproj" />
+    <Project Path="src/MachineMonitoringClean10.Web/MachineMonitoringClean10.Web.csproj" />
+  </Folder>
+  <Folder Name="/src/_aspire/">
+    <Project Path="src/MachineMonitoringClean10.AspireHost/MachineMonitoringClean10.AspireHost.csproj" />
+    <Project Path="src/MachineMonitoringClean10.ServiceDefaults/MachineMonitoringClean10.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MachineMonitoringClean10.FunctionalTests/MachineMonitoringClean10.FunctionalTests.csproj">
+      <BuildDependency Project="src/MachineMonitoringClean10.Web/MachineMonitoringClean10.Web.csproj" />
+    </Project>
+    <Project Path="tests/MachineMonitoringClean10.IntegrationTests/MachineMonitoringClean10.IntegrationTests.csproj">
+      <BuildDependency Project="src/MachineMonitoringClean10.Infrastructure/MachineMonitoringClean10.Infrastructure.csproj" />
+    </Project>
+    <Project Path="tests/MachineMonitoringClean10.UnitTests/MachineMonitoringClean10.UnitTests.csproj" />
+  </Folder>
+</Solution>
