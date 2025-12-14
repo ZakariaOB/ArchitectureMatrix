@@ -3,6 +3,7 @@ using MachineMonitoringClean10.Core.Services;
 using MachineMonitoringClean10.Infrastructure.Data;
 using MachineMonitoringClean10.Infrastructure.Data.Queries;
 using MachineMonitoringClean10.UseCases.Contributors.List;
+using MachineMonitoringClean10.UseCases.Machines.List;
 
 namespace MachineMonitoringClean10.Infrastructure;
 public static class InfrastructureServiceExtensions
@@ -45,6 +46,7 @@ public static class InfrastructureServiceExtensions
     services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>))
            .AddScoped(typeof(IReadRepository<>), typeof(EfRepository<>))
            .AddScoped<IListContributorsQueryService, ListContributorsQueryService>()
+           .AddScoped<IListMachinesQueryService, ListMachinesQueryService>()
            .AddScoped<IDeleteContributorService, DeleteContributorService>();
 
     logger.LogInformation("{Project} services registered", "Infrastructure");
