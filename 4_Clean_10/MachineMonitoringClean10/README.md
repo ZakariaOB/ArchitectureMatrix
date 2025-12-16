@@ -318,21 +318,460 @@ Domain events are a great pattern for decoupling a trigger for an operation from
 
 ![Domain Event Sequence Diagram](https://user-images.githubusercontent.com/782127/75702680-216ce300-5c73-11ea-9187-ec656192ad3b.png)
 
-## Related Projects
+## Machine Monitoring - Clean Architecture (.NET 10)
 
-- [ApiEndpoints](https://github.com/ardalis/apiendpoints)
-- [GuardClauses](https://github.com/ardalis/guardclauses)
-- [HttpClientTestExtensions](https://github.com/ardalis/HttpClientTestExtensions)
-- [Result](https://github.com/ardalis/result)
-- [SharedKernel](https://github.com/ardalis/Ardalis.SharedKernel)
-- [SmartEnum](https://github.com/ardalis/SmartEnum)
-- [Specification](https://github.com/ardalis/specification)
-- [FastEndpoints](https://fast-endpoints.com/)
+## ?? Overview
 
-## Presentations and Videos on Clean Architecture
+This project demonstrates **Clean Architecture** principles using a **Machine Monitoring** domain as a real-world example. The implementation showcases how Clean Architecture provides superior maintainability, testability, and flexibility compared to traditional layered architectures.
 
-- [What's New in Clean Architecture Template 9.1](https://www.youtube.com/watch?v=EJIgjL41em4)
-- [The REPR Pattern and Clean Architecture](https://www.youtube.com/watch?v=-AJcEJPwagQ)
-- [Clean Architecture with ASP.NET Core 8](https://www.youtube.com/watch?v=yF9SwL0p0Y0)
-- [Getting Started with Clean Architecture and .NET 8 (webinar)](https://www.youtube.com/watch?v=IsmyqNrfQQw)
+---
+
+## ??? Project Structure
+
+```
+MachineMonitoringClean10/
+?
+??? src/
+?   ??? MachineMonitoringClean10.Core/              # Enterprise Business Rules
+?   ?   ??? MachineAggregate/                        # Machine domain model
+?   ?   ?   ??? Machine.cs                           # ? Aggregate Root
+?   ?   ?   ??? MachineId.cs                         # Value Object
+?   ?   ?   ??? MachineName.cs                       # Value Object
+?   ?   ?   ??? MachineStatus.cs                     # SmartEnum
+?   ?   ?   ??? MachineProduction.cs                 # Value Object
+?   ?   ?   ??? Events/                              # Domain Events
+?   ?   ?   ??? Handlers/                            # Event Handlers
+?   ?   ?   ??? Specifications/                      # Query Specifications
+?   ?   ??? ContributorAggregate/                    # Example aggregate
+?   ?
+?   ??? MachineMonitoringClean10.UseCases/          # Application Business Rules
+?   ?   ??? Machines/
+?   ?       ??? Create/                              # Create Machine use case
+?   ?       ??? Get/                                 # Get Machine use case
+?   ?       ??? List/                                # List Machines use case
+?   ?       ??? AddProduction/                       # ? Record Production use case
+?   ?       ??? UpdateStatus/                        # Update Status use case
+?   ?       ??? Delete/                              # Delete Machine use case
+?   ?       ??? MachineDTO.cs                        # Data Transfer Object
+?   ?
+?   ??? MachineMonitoringClean10.Infrastructure/    # External Concerns
+?   ?   ??? Data/
+?   ?   ?   ??? AppDbContext.cs                      # EF Core DbContext
+?   ?   ?   ??? Config/                              # EF Configurations
+?   ?   ?   ?   ??? MachineConfiguration.cs          # Machine mapping
+?   ?   ?   ??? Queries/                             # Optimized read queries
+?   ?   ?       ??? ListMachinesQueryService.cs      # CQRS read model
+?   ?   ??? Email/                                   # Email infrastructure
+?   ?
+?   ??? MachineMonitoringClean10.Web/               # Presentation
+?       ??? Machines/                                # Machine API endpoints
+?       ?   ??? Create.cs                            # POST /Machines
+?       ?   ??? GetById.cs                           # GET /Machines/{id}
+?       ?   ??? List.cs                              # GET /Machines
+?       ?   ??? AddProduction.cs                     # ? POST /Machines/{id}/Production
+?       ?   ??? UpdateStatus.cs                      # PUT /Machines/{id}/Status
+?       ?   ??? Delete.cs                            # DELETE /Machines/{id}
+?       ??? Program.cs                               # Application entry point
+?
+??? docs/
+    ??? CLEAN_ARCHITECTURE_GUIDE.md                  # Complete architecture guide
+    ??? MACHINE_MONITORING_USE_CASE.md               # ? Use case documentation
+```
+
+---
+
+## ?? Key Features
+
+### **Machine Monitoring Domain**
+
+- ? **Create Machines** with validation
+- ? **Track Machine Status** (Inactive, Active, Maintenance, Decommissioned)
+- ? **Record Production** (only active machines)
+- ? **Production History** with date ranges
+- ? **Business Rules Enforcement** at domain level
+- ? **Domain Events** for notifications and side effects
+
+### **Clean Architecture Patterns**
+
+- ? **Value Objects**: `MachineName`, `MachineId`, `MachineProduction`
+- ? **SmartEnums**: `MachineStatus` with behavior
+- ? **Domain Events**: `MachineCreatedEvent`, `MachineProductionAddedEvent`
+- ? **Specifications**: `MachineByIdSpec`, `MachinesByStatusSpec`
+- ? **CQRS**: Separate commands (write) and queries (read)
+- ? **Repository Pattern**: Abstract data access
+- ? **Mediator Pattern**: Decoupled message handling
+
+---
+
+## ?? Getting Started
+
+### Prerequisites
+
+- .NET 10 SDK
+- SQL Server (or SQLite for local development)
+- Visual Studio 2022 / VS Code / Rider
+
+### Running the Application
+
+#### Option 1: With .NET Aspire (Recommended)
+
+```bash
+# Run the Aspire orchestrator
+cd src/MachineMonitoringClean10.AspireHost
+dotnet run
+```
+
+Aspire will:
+- Provision SQL Server container automatically
+- Configure connection strings
+- Provide dashboard at https://localhost:15888
+
+#### Option 2: Standalone Web API
+
+```bash
+# Run the Web project directly (uses SQLite)
+cd src/MachineMonitoringClean10.Web
+dotnet run
+```
+
+API will be available at:
+- https://localhost:5001
+- Swagger UI: https://localhost:5001/swagger
+
+---
+
+## ?? API Endpoints
+
+### **Machines**
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/Machines` | List all machines |
+| `GET` | `/Machines/{id}` | Get machine by ID |
+| `POST` | `/Machines` | Create new machine |
+| `POST` | `/Machines/{id}/Production` | **Record production** ? |
+| `PUT` | `/Machines/{id}/Status` | Update machine status |
+| `DELETE` | `/Machines/{id}` | Delete machine |
+
+### Example: Record Production
+
+```bash
+POST /Machines/1/Production
+Content-Type: application/json
+
+{
+  "quantity": 100,
+  "producedAt": "2024-01-15T10:30:00Z",
+  "batchNumber": "BATCH-001"
+}
+```
+
+**Business Rule**: Machine must be in **Active** status to record production.
+
+---
+
+## ?? Why This Example?
+
+The **Machine Production Recording** use case perfectly demonstrates Clean Architecture strengths:
+
+### 1. **Business Rules in Domain** ?
+
+```csharp
+// ? Traditional Layered: Rules in controller
+if (machine.Status != "Active") 
+  return BadRequest();
+
+// ? Clean Architecture: Rules in domain
+public Machine AddProduction(...)
+{
+  if (!Status.CanRecordProduction)
+    throw new InvalidOperationException("Machine must be Active");
+  // ...
+}
+```
+
+### 2. **Testability** ?
+
+```csharp
+// Pure unit test - no database, no HTTP
+[Fact]
+public void AddProduction_WhenInactive_ThrowsException()
+{
+  var machine = new Machine(MachineName.From("CNC-001"));
+  
+  Assert.Throws<InvalidOperationException>(() =>
+    machine.AddProduction(100, DateTime.UtcNow));
+}
+```
+
+### 3. **Multiple Interfaces** ?
+
+Business rules enforced consistently across:
+- REST API ?
+- gRPC (easy to add) ?
+- CLI (easy to add) ?
+- SignalR (easy to add) ?
+
+### 4. **CQRS Optimization** ?
+
+```csharp
+// Write: Go through domain (rules enforced)
+machine.AddProduction(...);
+
+// Read: Bypass domain (optimized SQL)
+dbContext.Machines.Select(m => new MachineDTO(...))
+```
+
+---
+
+## ?? Testing
+
+### Run All Tests
+
+```bash
+dotnet test
+```
+
+### Test Coverage
+
+- **Unit Tests**: Pure domain logic (no dependencies)
+- **Integration Tests**: Use case handlers (minimal mocking)
+- **Functional Tests**: End-to-end API tests
+
+Example unit test:
+
+```csharp
+[Fact]
+public void Machine_AddProduction_WhenActive_AddsSuccessfully()
+{
+  // Arrange
+  var machine = new Machine(MachineName.From("CNC-001"));
+  machine.Activate();
+
+  // Act
+  machine.AddProduction(100, DateTime.UtcNow, "BATCH-001");
+
+  // Assert
+  Assert.Equal(100, machine.GetTotalProduction());
+}
+```
+
+---
+
+## ?? Documentation
+
+### Essential Reading
+
+1. **[CLEAN_ARCHITECTURE_GUIDE.md](./CLEAN_ARCHITECTURE_GUIDE.md)**
+   - Complete architecture explanation
+   - Clean vs. Hexagonal vs. Onion comparison
+   - Code examples with detailed comments
+   - When to use Clean Architecture
+
+2. **[MACHINE_MONITORING_USE_CASE.md](./MACHINE_MONITORING_USE_CASE.md)** ?
+   - Step-by-step use case walkthrough
+   - Shows Clean Architecture strengths
+   - Side-by-side code comparisons
+   - Testing strategies
+
+### Layer-Specific READMEs
+
+- [Core README](./src/MachineMonitoringClean10.Core/README.md) - Domain model patterns
+- [UseCases README](./src/MachineMonitoringClean10.UseCases/README.md) - Application logic
+- [Infrastructure README](./src/MachineMonitoringClean10.Infrastructure/README.md) - External concerns
+
+---
+
+## ?? Learning Path
+
+### Beginner
+
+1. Read `CLEAN_ARCHITECTURE_GUIDE.md`
+2. Explore `Machine` entity in Core
+3. Trace a single use case (e.g., `AddProduction`)
+4. Run the application and test APIs
+
+### Intermediate
+
+1. Study domain events and handlers
+2. Understand CQRS implementation
+3. Explore specifications pattern
+4. Write unit tests for domain logic
+
+### Advanced
+
+1. Compare with Layered/Onion/Hexagonal implementations
+2. Add new use cases following existing patterns
+3. Implement integration tests
+4. Extend with new aggregates
+
+---
+
+## ?? Key Concepts Demonstrated
+
+| Concept | File/Location | Benefit |
+|---------|---------------|---------|
+| **Aggregate Root** | `Machine.cs` | Consistency boundary |
+| **Value Objects** | `MachineName.cs`, `MachineProduction.cs` | Type safety, validation |
+| **SmartEnum** | `MachineStatus.cs` | Business rules with enums |
+| **Domain Events** | `MachineProductionAddedEvent.cs` | Loose coupling |
+| **Specifications** | `MachineByIdSpec.cs` | Reusable queries |
+| **CQRS** | `AddProductionHandler` vs `ListMachinesQueryService` | Performance optimization |
+| **Repository** | `IRepository<Machine>` | Data access abstraction |
+| **Use Cases** | `Machines/AddProduction/` | Application orchestration |
+
+---
+
+## ?? Architecture Comparison
+
+See [CLEAN_ARCHITECTURE_GUIDE.md](./CLEAN_ARCHITECTURE_GUIDE.md#-clean-vs-hexagonal-vs-onion-whats-the-difference) for detailed comparison.
+
+**Quick Summary**:
+
+| Feature | Layered | Onion | Hexagonal | **Clean** |
+|---------|---------|-------|-----------|-----------|
+| Business Rules | ? Scattered | ?? Mixed | ? Centralized | ? **Pure Domain** |
+| Use Cases Layer | ? No | ? No | ?? Implicit | ? **Explicit** |
+| CQRS | ? No | ? No | ?? Manual | ? **Built-in** |
+| Value Objects | ? No | ?? Optional | ?? Optional | ? **Core Pattern** |
+| Domain Events | ? No | ? No | ?? Optional | ? **First-class** |
+
+---
+
+## ??? Technology Stack
+
+- **.NET 10** - Latest framework features
+- **C# 14** - Primary constructors, collection expressions
+- **EF Core** - ORM for data access
+- **FastEndpoints** - Minimal API framework
+- **MediatR** - Mediator pattern implementation
+- **Vogen** - Value object code generation
+- **SmartEnum** - Rich enum types
+- **Ardalis.Specification** - Repository pattern with specifications
+- **.NET Aspire** - Orchestration and observability
+
+---
+
+## ?? Clean Architecture Benefits
+
+### ? **Independence**
+- Framework agnostic (swap EF Core, ASP.NET, etc.)
+- Database agnostic (SQL Server, PostgreSQL, etc.)
+
+### ? **Testability**
+- Pure domain logic (no infrastructure)
+- Fast unit tests (no database/HTTP)
+
+### ? **Maintainability**
+- Business rules centralized
+- Clear boundaries between layers
+
+### ? **Flexibility**
+- Add new interfaces without code duplication
+- Change infrastructure without touching domain
+
+### ? **Scalability**
+- CQRS enables read/write optimization
+- Domain events enable async processing
+
+---
+
+## ?? Quick Reference
+
+### Create a Machine
+
+```bash
+POST /Machines
+{
+  "name": "CNC Machine 001",
+  "description": "High-precision CNC machine"
+}
+```
+
+### Activate Machine
+
+```bash
+PUT /Machines/1/Status
+{
+  "status": "Active"
+}
+```
+
+### Record Production (? Key Use Case)
+
+```bash
+POST /Machines/1/Production
+{
+  "quantity": 150,
+  "producedAt": "2024-01-15T14:30:00Z",
+  "batchNumber": "BATCH-2024-001"
+}
+```
+
+### Get Machine Details
+
+```bash
+GET /Machines/1
+
+Response:
+{
+  "id": 1,
+  "name": "CNC Machine 001",
+  "status": "Active",
+  "totalProduction": 150,
+  "lastProductionAt": "2024-01-15T14:30:00Z"
+}
+```
+
+---
+
+## ?? Contributing
+
+This is a reference implementation for educational purposes. Feel free to:
+
+1. Explore the code
+2. Run the application
+3. Read the documentation
+4. Learn the patterns
+5. Apply to your own projects
+
+---
+
+## ?? Support
+
+Need help understanding Clean Architecture?
+
+- ?? Read: [CLEAN_ARCHITECTURE_GUIDE.md](./CLEAN_ARCHITECTURE_GUIDE.md)
+- ?? Study: [MACHINE_MONITORING_USE_CASE.md](./MACHINE_MONITORING_USE_CASE.md)
+- ?? Reference: [Clean Architecture Template](https://github.com/ardalis/CleanArchitecture)
+- ?? Contact: [NimblePros](https://nimblepros.com)
+
+---
+
+## ?? Additional Resources
+
+- **Book**: *Clean Architecture* by Robert C. Martin (Uncle Bob)
+- **Blog**: [Ardalis.com](https://ardalis.com)
+- **Template**: [Ardalis Clean Architecture](https://github.com/ardalis/CleanArchitecture)
+- **Course**: [Clean Architecture with ASP.NET Core](https://www.pluralsight.com/courses/clean-architecture-asp-net-core)
+
+---
+
+## ? Highlights
+
+This implementation demonstrates:
+
+? **Rich Domain Model** - Business logic where it belongs  
+? **Value Objects** - Type-safe domain concepts  
+? **Domain Events** - Loose coupling at domain level  
+? **CQRS** - Optimized reads and writes  
+? **Testability** - Pure unit tests without mocking  
+? **Framework Independence** - Core has zero dependencies  
+? **Multiple Interfaces** - Same logic, different entry points  
+
+**The key insight**: In Clean Architecture, the business rule *"only active machines can record production"* lives in **one place** (`Machine.AddProduction()`), but is enforced **everywhere** - web API, tests, future interfaces. That's the power of Clean Architecture.
+
+---
+
+**Ready to explore?** Start with [MACHINE_MONITORING_USE_CASE.md](./MACHINE_MONITORING_USE_CASE.md) to see Clean Architecture in action! ??
 

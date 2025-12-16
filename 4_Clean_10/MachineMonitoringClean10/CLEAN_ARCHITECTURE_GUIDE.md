@@ -1,397 +1,246 @@
-# Clean Architecture in Machine Monitoring - .NET 10 Implementation
+﻿# Clean Architecture in Machine Monitoring - .NET 10 Implementation
 
 ## Overview
 
-This document explains the Machine Monitoring implementation in the **Clean Architecture** pattern using .NET 10, highlighting the **strengths and advantages** of this architectural approach compared to Layered, Onion, and Hexagonal architectures.
+This document explains the Machine Monitoring implementation in the **Clean Architecture** pattern using .NET 10, 
+highlighting the **strengths and advantages** of this architectural approach compared to Layered, Onion, and Hexagonal architectures.
 
 ---
 
-## ?? Clean Architecture Structure
+## 📐 Clean Architecture Structure
 
 ```
-???????????????????????????????????????????????????????????
-?                      Presentation                        ?
-?              (Web API - FastEndpoints)                   ?
-?  Controllers, Validators, HTTP concerns                  ?
-???????????????????????????????????????????????????????????
-                        ? Depends on
-???????????????????????????????????????????????????????????
-?                     Use Cases                            ?
-?         (Application Business Rules)                     ?
-?  Commands, Queries, Handlers, DTOs                       ?
-???????????????????????????????????????????????????????????
-                        ? Depends on
-???????????????????????????????????????????????????????????
-?                       Core                               ?
-?            (Enterprise Business Rules)                   ?
-?  Entities, Value Objects, Domain Events                  ?
-?  Aggregates, Specifications, Interfaces                  ?
-???????????????????????????????????????????????????????????
-                        ?
-                        ? Implements
-???????????????????????????????????????????????????????????
-?                 Infrastructure                           ?
-?       (External Concerns - Plugins)                      ?
-?  Database, External APIs, Email, File System             ?
-???????????????????????????????????????????????????????????
+┌─────────────────────────────────────────────────────────┐
+│                      Presentation                        │
+│              (Web API - FastEndpoints)                   │
+│  Controllers, Validators, HTTP concerns                  │
+└───────────────────────┬─────────────────────────────────┘
+                        │ Depends on
+┌───────────────────────▼─────────────────────────────────┐
+│                     Use Cases                            │
+│         (Application Business Rules)                     │
+│  Commands, Queries, Handlers, DTOs                       │
+└───────────────────────┬─────────────────────────────────┘
+                        │ Depends on
+┌───────────────────────▼─────────────────────────────────┐
+│                       Core                               │
+│            (Enterprise Business Rules)                   │
+│  Entities, Value Objects, Domain Events                  │
+│  Aggregates, Specifications, Interfaces                  │
+└─────────────────────────────────────────────────────────┘
+                        ▲
+                        │ Implements
+┌───────────────────────┴─────────────────────────────────┐
+│                 Infrastructure                           │
+│       (External Concerns - Plugins)                      │
+│  Database, External APIs, Email, File System             │
+└─────────────────────────────────────────────────────────┘
 ```
 
 **Key Principle**: Dependencies point **inward**. Core has **zero dependencies** on outer layers.
 
 ---
 
-## ?? Clean Architecture Strengths Demonstrated
+## 🔍 Clean vs. Hexagonal vs. Onion: What's the Difference?
 
-### 1. **Independence from Frameworks**
+All three architectures (Clean, Hexagonal, and Onion) share the same goal: **protecting the domain from external concerns**. However, they differ in their approach, emphasis, and practical implementation.
 
-**Example**: The `Machine` entity doesn't depend on Entity Framework, Web frameworks, or any infrastructure:
+### The Common Problem They Solve
+
+Traditional layered architectures create tight coupling between business logic and infrastructure:
+- Database changes require business logic changes
+- Testing requires spinning up databases
+- Switching frameworks means rewriting code
+- Business rules get scattered across layers
+
+**All three architectures solve this by inverting dependencies** - making infrastructure depend on the domain, not vice versa.
+
+---
+
+### 🧅 Onion Architecture
+
+**Creator**: Jeffrey Palermo (2008)
+
+**Visual Structure**:
+```
+┌─────────────────────────────────────┐
+│     Infrastructure (Outer Ring)     │
+│  ┌───────────────────────────────┐  │
+│  │   Application (Middle Ring)   │  │
+│  │  ┌─────────────────────────┐  │  │
+│  │  │  Domain (Core/Center)   │  │  │
+│  │  │  Entities, Services     │  │  │
+│  │  └─────────────────────────┘  │  │
+│  └───────────────────────────────┘  │
+└─────────────────────────────────────┘
+```
+
+**Key Characteristics**:
+- Domain is at the **center** (like an onion)
+- Dependencies point **inward** toward the core
+- Outer layers can depend on inner layers
+- Inner layers **never** depend on outer layers
+
+**In Our Codebase Example** (see `1_Onion` folder):
+```csharp
+// Onion: Domain layer
+public class Machine
+{
+    public int Id { get; private set; }
+    public string Name { get; set; }
+    private readonly List<MachineProduction> _productions = new();
+    
+    public void AddProduction(int totalProduction, DateTime createdDate)
+    {
+        if (totalProduction < 0)
+            throw new ArgumentException("Production must be positive");
+        
+        _productions.Add(new MachineProduction(this, totalProduction, createdDate, ...));
+    }
+}
+```
+
+**Strengths**:
+- ✅ Clear separation of concerns
+- ✅ Domain is protected from external changes
+- ✅ Good for Domain-Driven Design (DDD)
+
+**Limitations**:
+- ⚠️ **No explicit Use Cases layer** - application logic mixes with domain
+- ⚠️ **Less focus on CQRS** - reads and writes treated the same
+- ⚠️ **No standard for Value Objects** - developers may still use primitives
+- ⚠️ **Domain Events not emphasized** - typically added as an afterthought
+
+---
+
+### ⬡ Hexagonal Architecture (Ports & Adapters)
+
+**Creator**: Alistair Cockburn (2005)
+
+**Visual Structure**:
+```
+          ┌──────────────┐
+          │  REST API    │ (Adapter)
+          │  (HTTP)      │
+          └──────┬───────┘
+                 │
+         ┌───────▼────────┐
+         │  Input Port    │
+         │  (Interface)   │
+         └───────┬────────┘
+                 │
+    ┌────────────▼─────────────┐
+    │     Application Core     │
+    │   (Business Logic)       │
+    │   Domain + Use Cases     │
+    └────────────┬─────────────┘
+                 │
+         ┌───────▼────────┐
+         │  Output Port   │
+         │  (Interface)   │
+         └───────┬────────┘
+                 │
+          ┌──────▼───────┐
+          │  Database    │ (Adapter)
+          │  Adapter     │
+          └──────────────┘
+```
+**Key Characteristics**:
+- **Ports** = Interfaces (define what the application needs/exposes)
+- **Adapters** = Implementations (connect to external systems)
+- All external systems are **pluggable**
+- Core is isolated in the **hexagon center**
+
+**In Our Codebase Example** (see `2_Hexagonal` folder):
+```csharp
+// Hexagonal: Port (Interface in Core)
+public interface IMachineRepository
+{
+    Task<Machine> GetByIdAsync(string id);
+    Task SaveAsync(Machine machine);
+}
+
+// Adapter (Implementation in Infrastructure)
+public class SqlMachineRepository : IMachineRepository
+{
+    private readonly DbContext _context;
+    
+    public async Task<Machine> GetByIdAsync(string id)
+    {
+        // SQL Server implementation
+        return await _context.Machines.FindAsync(id);
+    }
+}
+```
+
+**Strengths**:
+- ✅ **Symmetry**: Input and output are both treated as adapters
+- ✅ **Testability**: Easy to swap real adapters with test doubles
+- ✅ **Framework agnostic**: Can plug in any technology
+
+**Limitations**:
+- ⚠️ **No clear separation between Domain and Application logic**
+- ⚠️ **CQRS not built-in** - must be added manually
+- ⚠️ **Doesn't prescribe internal structure** - developers choose their own patterns
+- ⚠️ **Value Objects and Domain Events** - not emphasized in the pattern
+
+---
+
+### 🎯 Clean Architecture
+
+**Creator**: Robert C. Martin (Uncle Bob) (2012)
+
+**Visual Structure** (Concentric Circles):
+```
+    ┌────────────────────────────────────┐
+    │   Frameworks & Drivers (Outermost) │
+    │  (Web, DB, External Interfaces)    │
+    │  ┌──────────────────────────────┐  │
+    │  │  Interface Adapters          │  │
+    │  │  (Controllers, Presenters,   │  │
+    │  │   Gateways)                  │  │
+    │  │  ┌────────────────────────┐  │  │
+    │  │  │  Use Cases             │  │  │
+    │  │  │  (Application Rules)   │  │  │
+    │  │  │  ┌──────────────────┐  │  │  │
+    │  │  │  │  Entities        │  │  │  │
+    │  │  │  │  (Enterprise     │  │  │  │
+    │  │  │  │   Business Rules)│  │  │  │
+    │  │  │  └──────────────────┘  │  │  │
+    │  │  └────────────────────────┘  │  │
+    │  └──────────────────────────────┘  │
+    └────────────────────────────────────┘
+```
+
+**Key Characteristics**:
+- **Explicit layers**: Entities (Core) → Use Cases → Interface Adapters → Frameworks
+- **Use Cases are first-class** - separate from domain entities
+- **CQRS-friendly** by design
+- **Emphasizes patterns**: Value Objects, Domain Events, Specifications
+
+**In Our Codebase Example** (see `4_Clean_10` folder):
 
 ```csharp
-/// <summary>
-/// Machine Aggregate Root - Pure domain logic, no framework dependencies
-/// </summary>
+// 1. Core (Entities) - Pure domain logic
 public class Machine : EntityBase<Machine, MachineId>, IAggregateRoot
 {
-    public MachineName Name { get; private set; }
-    public MachineStatus Status { get; private set; } = MachineStatus.Inactive;
-    private readonly List<MachineProduction> _productions = [];
+    public MachineName Name { get; private set; }  // Value Object
+    public MachineStatus Status { get; private set; }  // SmartEnum
     
-    // Business rules enforced in the domain
-    public Machine AddProduction(int quantity, DateTime producedAt, string? batchNumber = null)
+    public Machine AddProduction(int quantity, DateTime producedAt, string? batchNumber)
     {
-        if (!Status.CanRecordProduction)
-            throw new InvalidOperationException(
-                $"Cannot record production for a machine in {Status.Name} status");
+        if (!Status.CanRecordProduction)  // Business rule in domain
+            throw new InvalidOperationException(...);
         
         var production = new MachineProduction(quantity, producedAt, DateTime.UtcNow, batchNumber);
         _productions.Add(production);
         
-        RegisterDomainEvent(new MachineProductionAddedEvent(this, production));
+        RegisterDomainEvent(new MachineProductionAddedEvent(this, production));  // Domain Event
         return this;
     }
 }
-```
 
-**Why this matters**:
-- ? You can switch from EF Core to Dapper or any ORM without touching domain logic
-- ? Web framework changes (ASP.NET Core ? minimal APIs ? gRPC) don't affect core business rules
-- ? Domain logic can be tested without any infrastructure
-
-### 2. **Testability**
-
-**Example**: Testing `AddProduction` without any database or infrastructure:
-
-```csharp
-[Fact]
-public void AddProduction_WhenMachineInactive_ThrowsException()
-{
-    // Arrange - Pure domain objects
-    var machine = new Machine(MachineName.From("CNC-001"));
-    
-    // Act & Assert - No database, no mocking needed
-    Assert.Throws<InvalidOperationException>(() =>
-        machine.AddProduction(100, DateTime.UtcNow));
-}
-```
-
-**Comparison with other architectures**:
-- ? Layered: Business logic mixed with data access ? need database for tests
-- ? Onion: Better but still coupled to repository abstractions
-- ? Clean: Domain is completely isolated ? unit tests are fast and simple
-
-### 3. **Rich Domain Model with Value Objects**
-
-**Example**: `MachineName` Value Object prevents primitive obsession:
-
-```csharp
-[ValueObject<string>(conversions: Conversions.SystemTextJson)]
-public partial struct MachineName
-{
-    public const int MaxLength = 100;
-    public const int MinLength = 2;
-
-    private static Validation Validate(in string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            return Validation.Invalid("Machine name cannot be empty");
-        
-        if (name.Length < MinLength)
-            return Validation.Invalid($"Machine name must be at least {MinLength} characters");
-        
-        if (name.Length > MaxLength)
-            return Validation.Invalid($"Machine name cannot exceed {MaxLength} characters");
-        
-        return Validation.Ok;
-    }
-}
-```
-
-**Benefits**:
-- ? Validation happens at **domain level**, not in controllers or services
-- ? Impossible to create invalid `MachineName` - **compile-time safety**
-- ? Type-safe: can't accidentally pass `string` where `MachineName` is expected
-- ? Self-documenting code: `MachineName` is more meaningful than `string`
-
-### 4. **SmartEnum for Business Logic**
-
-**Example**: `MachineStatus` encapsulates status-related rules:
-
-```csharp
-public class MachineStatus : SmartEnum<MachineStatus>
-{
-    public static readonly MachineStatus Active = new(nameof(Active), 1);
-    public static readonly MachineStatus Inactive = new(nameof(Inactive), 0);
-    public static readonly MachineStatus Maintenance = new(nameof(Maintenance), 2);
-    public static readonly MachineStatus Decommissioned = new(nameof(Decommissioned), 3);
-
-    // Business rules encoded in the type
-    public bool CanRecordProduction => this == Active;
-    public bool CanBeDeleted => this == Inactive || this == Decommissioned;
-}
-```
-
-**Comparison**:
-- ? Layered: Status is just an enum, rules scattered in services
-- ? Onion: Similar issues with primitive types
-- ? Clean: Business rules **live with the data** they govern
-
-### 5. **Domain Events for Loose Coupling**
-
-**Example**: `MachineCreatedEvent` enables side effects without tight coupling:
-
-```csharp
-// Domain raises event
-public Machine(MachineName name, string? description = null)
-{
-    Name = name;
-    Description = description;
-    
-    RegisterDomainEvent(new MachineCreatedEvent(this));
-}
-
-// Infrastructure handles it asynchronously
-public class MachineCreatedNotificationHandler : INotificationHandler<MachineCreatedEvent>
-{
-    public async ValueTask Handle(MachineCreatedEvent notification, ...)
-    {
-        // Send email, update dashboard, log analytics
-        await _emailSender.SendEmailAsync(...);
-    }
-}
-```
-
-**Advantages**:
-- ? **Machine entity** doesn't know about email sending
-- ? Add/remove event handlers without modifying domain
-- ? Multiple handlers can react to the same event
-- ? Domain remains **pure** and **focused**
-
-### 6. **CQRS Pattern in Use Cases**
-
-**Commands** (change state):
-
-```csharp
-public record AddProductionCommand(
-    int MachineId,
-    int Quantity,
-    DateTime ProducedAt,
-    string? BatchNumber) : ICommand<Result>;
-
-public class AddProductionHandler : ICommandHandler<AddProductionCommand, Result>
-{
-    public async ValueTask<Result> Handle(...)
-    {
-        // Fetch aggregate
-        var machine = await _repository.FirstOrDefaultAsync(spec, ...);
-        
-        // Execute domain logic
-        machine.AddProduction(command.Quantity, command.ProducedAt, command.BatchNumber);
-        
-        // Persist
-        await _repository.UpdateAsync(machine, ...);
-        
-        return Result.Success();
-    }
-}
-```
-
-**Queries** (read data) - bypass domain for performance:
-
-```csharp
-public class ListMachinesQueryService : IListMachinesQueryService
-{
-    public async Task<(IReadOnlyList<MachineDTO> Items, int TotalCount)> ListAsync(...)
-    {
-        // Direct database query - optimized for reads
-        return await _dbContext.Machines
-            .AsNoTracking()
-            .Select(m => new MachineDTO(...))
-            .ToListAsync(...);
-    }
-}
-```
-
-**Benefits**:
-- ? **Writes** go through domain ? business rules enforced
-- ? **Reads** optimized with projections ? better performance
-- ? Separation of concerns ? easier to optimize each independently
-
-### 7. **Specification Pattern**
-
-**Example**: Encapsulate query logic in the domain:
-
-```csharp
-public sealed class MachineByIdSpec : Specification<Machine>
-{
-    public MachineByIdSpec(MachineId machineId)
-    {
-        Query.Where(m => m.Id == machineId);
-    }
-}
-
-// Usage in handler
-var spec = new MachineByIdSpec(machineId);
-var machine = await _repository.FirstOrDefaultAsync(spec, cancellationToken);
-```
-
-**Why specifications**:
-- ? Query logic **belongs to the domain**, not infrastructure
-- ? Reusable across use cases
-- ? Testable independently
-- ? Can be combined for complex queries
-
-### 8. **Guard Clauses for Validation**
-
-**Example**: Fail fast with clear error messages:
-
-```csharp
-public sealed record MachineProduction
-{
-    public MachineProduction(int quantity, DateTime producedAt, DateTime recordedAt, ...)
-    {
-        Guard.Against.NegativeOrZero(quantity, nameof(quantity), 
-            "Production quantity must be positive");
-        Guard.Against.Default(producedAt, nameof(producedAt));
-        
-        if (producedAt > recordedAt)
-            throw new ArgumentException(
-                "Production date cannot be in the future relative to recording date");
-        
-        Quantity = quantity;
-        ProducedAt = producedAt;
-        RecordedAt = recordedAt;
-    }
-}
-```
-
-**Advantages**:
-- ? **Explicit** validation at construction
-- ? Impossible to create invalid objects
-- ? Clear error messages for debugging
-
-### 9. **Business Rules in Domain, Not Controllers**
-
-**Comparison**: Deleting a machine
-
-**? Layered Architecture** (rules in service layer):
-```csharp
-public async Task<bool> DeleteMachine(int id)
-{
-    var machine = await _repo.GetById(id);
-    
-    // Business rules in service - scattered logic
-    if (machine.Status == "Active") return false;
-    if (machine.Productions.Any(p => p.Date > DateTime.Now.AddDays(-30))) 
-        return false;
-    
-    await _repo.Delete(id);
-    return true;
-}
-```
-
-**? Clean Architecture** (rules in domain):
-```csharp
-// Domain Entity
-public void EnsureCanBeDeleted()
-{
-    if (!Status.CanBeDeleted)
-        throw new InvalidOperationException(
-            $"Machine in {Status.Name} status cannot be deleted");
-    
-    if (HasRecentProduction())
-        throw new InvalidOperationException(
-            "Cannot delete machine with production records in the last 30 days");
-}
-
-// Use Case Handler - just orchestrates
-public async ValueTask<Result> Handle(DeleteMachineCommand command, ...)
-{
-    var machine = await _repository.FirstOrDefaultAsync(spec, ...);
-    
-    machine.EnsureCanBeDeleted(); // Domain enforces rules
-    
-    await _repository.DeleteAsync(machine, ...);
-    return Result.Success();
-}
-```
-
-**Result**: Business rules are **centralized, testable, and enforced everywhere**.
-
-### 10. **Dependency Inversion**
-
-**Example**: Core defines interfaces, Infrastructure implements them:
-
-```csharp
-// Core layer - defines what it needs
-public interface IListMachinesQueryService
-{
-    Task<(IReadOnlyList<MachineDTO> Items, int TotalCount)> ListAsync(...);
-}
-
-// Infrastructure layer - provides implementation
-public class ListMachinesQueryService : IListMachinesQueryService
-{
-    public async Task<(IReadOnlyList<MachineDTO> Items, int TotalCount)> ListAsync(...)
-    {
-        // EF Core implementation
-        return await _dbContext.Machines.AsNoTracking()...;
-    }
-}
-```
-
-**Power of this approach**:
-- ? Core doesn't know about EF Core, SQL Server, etc.
-- ? Can swap implementations without changing use cases
-- ? Can have multiple implementations (in-memory for tests, SQL for production)
-
----
-
-## ?? Use Case: Adding Production to a Machine
-
-Let's trace a request through all layers:
-
-### 1. **Web Layer** (Presentation)
-
-```csharp
-public class AddProduction : Endpoint<AddProductionRequest, ...>
-{
-    public override async Task ExecuteAsync(AddProductionRequest request, ...)
-    {
-        var command = new AddProductionCommand(
-            request.MachineId,
-            request.Quantity,
-            request.ProducedAt,
-            request.BatchNumber);
-        
-        var result = await _mediator.Send(command);
-        // HTTP concerns only - no business logic here
-    }
-}
-```
-
-### 2. **Use Cases Layer** (Application Logic)
-
-```csharp
+// 2. Use Cases - Application logic (separate from domain)
 public class AddProductionHandler : ICommandHandler<AddProductionCommand, Result>
 {
     public async ValueTask<Result> Handle(...)
@@ -408,75 +257,226 @@ public class AddProductionHandler : ICommandHandler<AddProductionCommand, Result
         return Result.Success();
     }
 }
-```
 
-### 3. **Core Layer** (Domain Logic)
-
-```csharp
-public Machine AddProduction(int quantity, DateTime producedAt, string? batchNumber)
+// 3. Interface Adapters - Web layer
+public class AddProduction : Endpoint<AddProductionRequest, ...>
 {
-    // Business rule: Only active machines can record production
-    if (!Status.CanRecordProduction)
-        throw new InvalidOperationException(...);
-    
-    var production = new MachineProduction(quantity, producedAt, DateTime.UtcNow, batchNumber);
-    _productions.Add(production);
-    LastProductionAt = producedAt;
-    
-    // Raise domain event
-    RegisterDomainEvent(new MachineProductionAddedEvent(this, production));
-    
-    return this;
-}
-```
-
-### 4. **Infrastructure Layer** (External Concerns)
-
-```csharp
-// EF Core handles persistence
-public class AppDbContext : DbContext
-{
-    public DbSet<Machine> Machines => Set<Machine>();
-}
-
-// Event handler sends notifications
-public class MachineProductionAddedHandler : INotificationHandler<...>
-{
-    public ValueTask Handle(MachineProductionAddedEvent notification, ...)
+    public override async Task ExecuteAsync(...)
     {
-        // Log, send email, update dashboard
-        _logger.LogInformation("Production recorded: {Quantity} units", ...);
-        return ValueTask.CompletedTask;
+        var command = new AddProductionCommand(
+            request.MachineId,
+            request.Quantity,
+            request.ProducedAt,
+            request.BatchNumber);
+        
+        var result = await _mediator.Send(command);
+        // Only HTTP concerns - no business logic
+    }
+}
+
+// 4. Infrastructure - External concerns
+public class MachineConfiguration : IEntityTypeConfiguration<Machine>
+{
+    public void Configure(EntityTypeBuilder<Machine> builder)
+    {
+        // EF Core mappings - completely separate from domain
+        builder.Property(e => e.Name).HasVogenConversion();
     }
 }
 ```
 
-**Key observations**:
-- Business rule ("only active machines") is in **Core**, not scattered
-- Web layer knows **nothing** about business rules
-- Use Cases orchestrate without duplicating domain logic
-- Infrastructure is a **plugin** that can be replaced
+**Strengths**:
+- ✅ **Explicit Use Cases layer** - clear separation of domain from application logic
+- ✅ **CQRS built-in** - Commands and Queries are natural patterns
+- ✅ **Value Objects emphasized** - eliminates primitive obsession
+- ✅ **Domain Events as first-class citizens** - loose coupling by default
+- ✅ **Testability** - each layer can be tested independently
+- ✅ **Rich patterns library** - Specifications, Result objects, Guard clauses
+
+**Limitations**:
+- ⚠️ **Steeper learning curve** - more concepts to understand
+- ⚠️ **More boilerplate** - more files and layers than simpler architectures
+- ⚠️ **Can be overkill** for simple CRUD applications
 
 ---
 
-## ?? Comparison with Other Architectures
+## 🆚 Side-by-Side Comparison
 
-| Aspect | Layered | Onion | Hexagonal | **Clean** |
-|--------|---------|-------|-----------|-----------|
-| **Domain Independence** | ? Coupled to data layer | ?? Better but coupled to interfaces | ? Good | ? **Excellent** |
-| **Testability** | ? Needs database | ?? Needs mocking | ? Good | ? **Best** - pure domain |
-| **Business Rules** | ? Scattered in services | ?? In domain but mixed with persistence concerns | ? In domain | ? **Pure domain** |
-| **Value Objects** | ? Primitive obsession | ?? Not emphasized | ?? Optional | ? **Core pattern** |
-| **Domain Events** | ? Not a pattern | ? Not a pattern | ?? Optional | ? **First-class** |
-| **CQRS Support** | ? Not inherent | ? Not inherent | ?? Can add | ? **Built-in** |
-| **Framework Independence** | ? Tightly coupled | ?? Better | ? Good | ? **Best** |
-| **Learning Curve** | ? Easy | ?? Moderate | ?? Moderate | ?? **Steep but worth it** |
+### Example: Deleting a Machine
+
+#### ❌ **Layered Architecture**
+```csharp
+// Business logic in SERVICE layer (scattered)
+public class MachineService
+{
+    public async Task<bool> DeleteMachine(int id)
+    {
+        var machine = await _repo.GetById(id);
+        
+        // Business rules in service - scattered logic
+        if (machine.Status == "Active") return false;
+        if (machine.Productions.Any(p => p.Date > DateTime.Now.AddDays(-30))) 
+            return false;
+        
+        await _repo.Delete(id);
+        return true;
+    }
+}
+```
+**Problem**: Business rules in service layer, not testable without database.
 
 ---
 
-## ?? When to Use Clean Architecture
+#### 🧅 **Onion Architecture**
+```csharp
+// Domain layer
+public class Machine
+{
+    public void EnsureCanBeDeleted(DateTime now)
+    {
+        if (_productions.Any(p => p.CreatedAt >= now.AddDays(-30)))
+            throw new DomainException("Machine has recent production");
+    }
+}
 
-### ? **Use Clean Architecture when**:
+// Application Service (no separate Use Cases layer)
+public class MachineService
+{
+    public async Task DeleteMachine(int id)
+    {
+        var machine = await _repo.GetByIdAsync(id);
+        machine.EnsureCanBeDeleted(DateTime.UtcNow);  // Domain enforces rules
+        await _repo.DeleteAsync(machine);
+    }
+}
+```
+**Better**: Business rules in domain, but **application logic mixed with domain service**.
+
+---
+
+#### ⬡ **Hexagonal Architecture**
+```csharp
+// Core (Domain + Application together)
+public class Machine
+{
+    public bool CanBeDeleted(DateTime now) =>
+        !Productions.Any(p => p.CreatedAt >= now.AddDays(-30));
+}
+
+// Application Service (Port)
+public interface IDeleteMachineUseCase
+{
+    Task<bool> ExecuteAsync(String machineId);
+}
+
+// Implementation
+public class DeleteMachineUseCase : IDeleteMachineUseCase
+{
+    public async Task<bool> ExecuteAsync(string machineId)
+    {
+        var machine = await _machinePort.GetByIdAsync(machineId);
+        
+        if (!machine.CanBeDeleted(DateTime.UtcNow))
+            return false;
+        
+        await _machinePort.DeleteAsync(machine);
+        return true;
+    }
+}
+```
+**Good**: Ports and Adapters clear, but **Use Cases not as explicit** as Clean Architecture.
+
+---
+
+#### 🎯 **Clean Architecture**
+```csharp
+// 1. ENTITIES (Core) - Pure business rules
+public class Machine : EntityBase<Machine, MachineId>
+{
+    public MachineStatus Status { get; private set; }  // SmartEnum with rules
+    
+    public void EnsureCanBeDeleted()
+    {
+        // Business rule: Status must allow deletion
+        if (!Status.CanBeDeleted)
+            throw new InvalidOperationException(
+                $"Machine in {Status.Name} status cannot be deleted");
+        
+        // Business rule: No recent production
+        if (HasRecentProduction())
+            throw new InvalidOperationException(
+                "Cannot delete machine with production in last 30 days");
+    }
+    
+    public bool HasRecentProduction(int days = 30) =>
+        _productions.Any(p => p.ProducedAt >= DateTime.UtcNow.AddDays(-days));
+}
+
+// 2. USE CASES - Application orchestration (separate layer)
+public record DeleteMachineCommand(int MachineId) : ICommand<Result>;
+
+public class DeleteMachineHandler : ICommandHandler<DeleteMachineCommand, Result>
+{
+    private readonly IRepository<Machine> _repository;
+    
+    public async ValueTask<Result> Handle(DeleteMachineCommand command, ...)
+    {
+        var machineId = MachineId.From(command.MachineId);  // Value Object
+        var spec = new MachineByIdSpec(machineId);  // Specification pattern
+        
+        var machine = await _repository.FirstOrDefaultAsync(spec, ...);
+        if (machine is null) return Result.NotFound("Machine not found");
+        
+        // Domain enforces rules - Use Case just orchestrates
+        machine.EnsureCanBeDeleted();
+        
+        await _repository.DeleteAsync(machine, ...);
+        return Result.Success();
+    }
+}
+
+// 3. INTERFACE ADAPTERS - Web layer
+public class Delete : Endpoint<DeleteMachineRequest, ...>
+{
+    public override async Task ExecuteAsync(...)
+    {
+        var result = await _mediator.Send(new DeleteMachineCommand(request.MachineId));
+        return result.ToDeleteResult();  // HTTP concerns only
+    }
+}
+```
+
+**Best**: 
+- ✅ Business rules **100% in domain**
+- ✅ Use Case **explicitly orchestrates** without duplicating logic
+- ✅ **Value Objects** prevent primitive obsession
+- ✅ **Specification pattern** for queries
+- ✅ **Result pattern** for error handling
+- ✅ Web layer **completely decoupled**
+
+---
+
+## 📊 Key Differences Summary
+
+| Aspect | Onion | Hexagonal | **Clean** |
+|--------|-------|-----------|-----------|
+| **Layer Structure** | Domain → Application → Infrastructure | Core (Domain + App) → Adapters | **Entities → Use Cases → Adapters → Frameworks** |
+| **Use Cases** | No explicit layer | Implicit in core | **✅ Explicit first-class layer** |
+| **CQRS Support** | Add manually | Add manually | **✅ Built-in (Commands/Queries)** |
+| **Value Objects** | Optional | Optional | **✅ Core pattern, emphasized** |
+| **Domain Events** | Can add | Can add | **✅ First-class citizens** |
+| **Specifications** | Rarely used | Can add | **✅ Standard pattern** |
+| **Testing** | Good | Good | **✅ Excellent (pure domain + use cases)** |
+| **Complexity** | Medium | Medium | High (but justified for complex domains) |
+| **Prescriptive Patterns** | Somewhat | Minimal | Many |
+| **Learning Curve** | Easy | Moderate | Steep but worth it |
+| **Best For** | Simple CRUD | DDD apps | Multi-interface apps | **Complex business domains** |
+
+---
+
+## 💡 When to Use Clean Architecture
+
+### ✅ **Use Clean Architecture when**:
 1. **Complex Business Logic**: Your application has sophisticated business rules
 2. **Long-term Maintenance**: Project will be maintained for years
 3. **Multiple Interfaces**: Need to support Web API, gRPC, CLI, etc.
@@ -484,7 +484,7 @@ public class MachineProductionAddedHandler : INotificationHandler<...>
 5. **Testability Critical**: High test coverage required
 6. **Framework Flexibility**: May need to change frameworks/databases
 
-### ? **Don't use Clean Architecture for**:
+### ❌ **Don't use Clean Architecture for**:
 1. **Simple CRUD**: Basic Create-Read-Update-Delete operations
 2. **Prototypes**: Rapid prototyping where architecture overhead slows you down
 3. **Small Scripts**: Utility scripts or one-off tools
@@ -492,7 +492,7 @@ public class MachineProductionAddedHandler : INotificationHandler<...>
 
 ---
 
-## ?? Key Takeaways
+## 📚 Key Takeaways
 
 1. **Dependency Rule**: Dependencies point inward. Core has zero dependencies.
 
@@ -512,7 +512,7 @@ public class MachineProductionAddedHandler : INotificationHandler<...>
 
 ---
 
-## ?? Clean Architecture in .NET 10
+## 🚀 Clean Architecture in .NET 10
 
 This implementation leverages **modern C# features**:
 
@@ -528,11 +528,19 @@ This implementation leverages **modern C# features**:
 
 ## Conclusion
 
-Clean Architecture provides **maximum flexibility, testability, and maintainability** at the cost of initial complexity. For machine monitoring systems with complex business rules, regulatory requirements, and long-term maintenance needs, this investment pays significant dividends.
+**Clean Architecture** stands out from Onion and Hexagonal architectures by:
+- ✅ Making **Use Cases explicit** (not mixed with domain or infrastructure)
+- ✅ Having **CQRS built-in** (Commands and Queries as natural patterns)
+- ✅ **Emphasizing rich domain patterns** (Value Objects, Domain Events, Specifications)
+- ✅ Providing **clear guidance** on where code belongs
+
+While **Onion** and **Hexagonal** solve the dependency problem, **Clean Architecture** goes further by prescribing **battle-tested patterns** that lead to maintainable, testable, and flexible code.
+
+For machine monitoring systems with complex business rules, regulatory requirements, and long-term maintenance needs, this investment pays significant dividends.
 
 The separation of concerns ensures that:
-- ? Business rules are **explicit and enforceable**
-- ? Tests are **fast and comprehensive**
-- ? Changes are **isolated and safe**
-- ? Code is **self-documenting**
-- ? Architecture is **future-proof**
+- ✅ Business rules are **explicit and enforceable**
+- ✅ Tests are **fast and comprehensive**
+- ✅ Changes are **isolated and safe**
+- ✅ Code is **self-documenting**
+- ✅ Architecture is **future-proof**
