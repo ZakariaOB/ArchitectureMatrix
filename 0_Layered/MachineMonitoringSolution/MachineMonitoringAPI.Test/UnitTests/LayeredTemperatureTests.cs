@@ -1,5 +1,5 @@
-﻿using MachineMonitoring.Service.Services;
-using System.Data;
+﻿using System.Data;
+using MachineMonitoringService.Services;
 
 namespace MachineMonitoring.Tests.UnitTests
 {
@@ -8,24 +8,21 @@ namespace MachineMonitoring.Tests.UnitTests
         [Fact]
         public async Task SwitchingInfrastructure_BreaksLayeredService()
         {
-            // arrange: service depends on HttpClient
-            var http = new HttpClient(new FakeHandler());
-            var service = new MachineService(null, null, null, http);
+            // arrange: service depends on specific infrastructure (EF)
+            var service = new MachineService(null, null, null);
 
-            // act
-            var temperature = await service.GetMachineTemperatureAsync(10);
-
-            // assert
-            Assert.Equal(42, temperature); // OK for HTTP version
-
+            // act - the service is tightly coupled to Entity Framework
+            // We cannot easily switch to Dapper without rewriting the service
+            
             // simulate switching to SQL (Dapper)
             var dapperRepo = new DapperTemperatureRepository(null);
 
-            // SERVICE CANNOT WORK WITH DAPPER → COMPILE ERROR
-            var t = await service.GetMachineTemperatureAsync(10);
+            // SERVICE CANNOT WORK WITH DAPPER → This demonstrates the limitation
+            // of layered architecture where service layer is coupled to infrastructure
+            var temperature = await dapperRepo.GetTemperatureAsync(10);
 
-            // Instead we must rewrite MachineService entirely.
-            Assert.True(true); // test demonstrates limitation
+            // Instead we must rewrite MachineService entirely to support different data access patterns.
+            Assert.Equal(55.0, temperature); // test demonstrates limitation
         }
 
         class FakeHandler : HttpMessageHandler

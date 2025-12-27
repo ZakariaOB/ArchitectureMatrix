@@ -6,7 +6,7 @@ using OnionMachineMonitoring.Application.Interfaces;
 using OnionMachineMonitoring.Core.Entities;
 using OnionMachineMonitoring.Domain.Interfaces;
 
-namespace Core.Application.UseCases;
+namespace OnionMachineMonitoring.Application.UseCases;
 
 public sealed class SyncMachineProductionForDateRange
 {
@@ -24,8 +24,18 @@ public sealed class SyncMachineProductionForDateRange
     public async Task ExecuteAsync(Guid machineId, DateTime fromUtc, DateTime toUtc, IEnumerable<MachineProduction> incoming, CancellationToken ct)
     {
         await _repo.UpsertRangeAsync([]);
-        await _events.PublishAsync(new SyncCompleted(machineId, fromUtc, toUtc, DateTime.UtcNow), ct);
+       
+        await _events.PublishAsync(new SyncCompleted(
+            machineId, 
+            fromUtc, 
+            toUtc, 
+            DateTime.UtcNow), 
+            ct);
     }
 
-    public sealed record SyncCompleted(Guid MachineId, DateTime FromUtc, DateTime ToUtc, DateTime CompletedAtUtc);
+    public sealed record SyncCompleted(
+        Guid MachineId, 
+        DateTime FromUtc, 
+        DateTime ToUtc, 
+        DateTime CompletedAtUtc);
 }

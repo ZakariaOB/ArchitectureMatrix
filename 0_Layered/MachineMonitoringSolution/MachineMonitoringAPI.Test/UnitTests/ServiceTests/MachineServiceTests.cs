@@ -1,5 +1,6 @@
 ﻿using ArchitectureMatrix.DependencyInversion.Layered_IQueryableLeak;
 using MachineMonitoring.Repository.DataContext;
+using MachineMonitoring.Repository.Repositories;
 using MachineMonitoringRepository.Models;
 using MachineMonitoringRepository.Repositories;
 using MachineMonitoringService.Services;

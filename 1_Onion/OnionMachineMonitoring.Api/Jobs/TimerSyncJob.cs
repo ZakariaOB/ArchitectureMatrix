@@ -1,6 +1,6 @@
 ﻿// App/Jobs/TimerSyncJob.cs   (Timer CSV — DUPLICATED parsing)
-using Core.Application.UseCases;
 using Microsoft.Extensions.Options;
+using OnionMachineMonitoring.Application.UseCases;
 using OnionMachineMonitoring.Core.Entities;
 
 namespace App.Jobs;

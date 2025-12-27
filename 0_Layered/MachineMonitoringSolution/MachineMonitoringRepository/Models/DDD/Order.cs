@@ -23,8 +23,8 @@ namespace MachineMonitoringRepository.Models.DDD
     /// </summary>
     public class Order
     {
-        private readonly List<OrderLine> _lines = new List<OrderLine>();
-        private readonly List<object> _domainEvents = new List<object>();
+        private readonly List<OrderLine> _lines = [];
+        private readonly List<object> _domainEvents = [];
 
         public OrderId Id { get; private set; }
         public string CustomerName { get; private set; }

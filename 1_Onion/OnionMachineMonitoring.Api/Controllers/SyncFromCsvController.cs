@@ -1,6 +1,6 @@
 ﻿// App/Controllers/SyncFromCsvController.cs  (CSV upload — DUPLICATES parsing)
-using Core.Application.UseCases;
 using Microsoft.AspNetCore.Mvc;
+using OnionMachineMonitoring.Application.UseCases;
 using OnionMachineMonitoring.Core.Entities;
 
 namespace App.Controllers;

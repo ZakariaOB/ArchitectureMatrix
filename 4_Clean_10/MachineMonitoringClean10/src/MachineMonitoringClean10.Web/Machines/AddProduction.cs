@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using MachineMonitoringClean10.UseCases.Machines.AddProduction;
-using MachineMonitoringClean10.Web.Extensions;
 using FluentValidation;
+using MachineMonitoringClean10.UseCases.Machines.AddProduction;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace MachineMonitoringClean10.Web.Machines;

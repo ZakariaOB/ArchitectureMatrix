@@ -4,10 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MachineMonitoring.Repository.Repositories;
 
-public class MaintenanceRepository
+public class MaintenanceRepository(MachineMonitoringContext db)
 {
-    private readonly MachineMonitoringContext _db;
-    public MaintenanceRepository(MachineMonitoringContext db) => _db = db;
+    private readonly MachineMonitoringContext _db = db;
 
     public async Task<IEnumerable<MaintenanceTask>> GetOverdueTasksAsync(DateTime cutoff)
     => await _db.MaintenanceTasks
@@ -18,9 +17,13 @@ public class MaintenanceRepository
     {
         var tracked = await _db.MaintenanceTasks.FindAsync(task.Id);
         if (tracked is null)
+        {
             _db.MaintenanceTasks.Add(task);
+        }
         else
+        {
             _db.Entry(tracked).CurrentValues.SetValues(task);
+        }
 
         await _db.SaveChangesAsync();
     }
