@@ -5,6 +5,7 @@ using MachineMonitoringRepository.Models;
 using MachineMonitoringRepository.Repositories;
 using MachineMonitoringService.Dto;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace MachineMonitoringService.Services
 {
@@ -67,6 +68,7 @@ namespace MachineMonitoringService.Services
         {
             // EF.Functions.Like() only works with EF LINQ provider
             return [.. _machineRepository.GetAllMachines()
+                        .AsQueryable()
                         .Where(m => EF.Functions.Like(m.Name, $"{prefix}%"))
                         .Select(m => m.Name)];
         }

@@ -6,6 +6,6 @@ namespace MachineMonitoringRepository.Repositories
 {
     public interface IMachineRepository : IRepository<Machine>
     {
-        IQueryable<Machine> GetAllMachines();
+        IEnumerable<Machine> GetAllMachines();
     }
 }

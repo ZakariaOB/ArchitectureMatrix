@@ -10,13 +10,6 @@ public class MachineRepository(MachineMonitoringContext dbContext) : IMachineRep
 {
     private readonly MachineMonitoringContext _dbContext = dbContext;
 
-    private readonly List<Machine> _machines =
-    [
-        new() { Name = "Cutter" },
-        new() { Name = "Printer" },
-        new() { Name = "Folder" }
-    ];
-
     public async Task<Machine> GetByIdAsync(int id)
     {
         return await _dbContext.Set<Machine>()
@@ -50,5 +43,5 @@ public class MachineRepository(MachineMonitoringContext dbContext) : IMachineRep
         return _dbContext.SaveChanges() > 0 ? EntityDeleteResult.Deleted: EntityDeleteResult.NoDeletion;
     }
 
-    public IQueryable<Machine> GetAllMachines() => _dbContext.Machines;
+    public IEnumerable<Machine> GetAllMachines() => _dbContext.Machines;
 }

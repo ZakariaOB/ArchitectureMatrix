@@ -26,7 +26,7 @@ public class ApiMachineRepository : IMachineRepository
         throw new NotImplementedException();
     }
 
-    public IQueryable<Machine> GetAllMachines()
+    public IEnumerable<Machine> GetAllMachines()
     {
         // Works syntactically, but EF-specific functions will fail at runtime
         return _machines.AsQueryable();

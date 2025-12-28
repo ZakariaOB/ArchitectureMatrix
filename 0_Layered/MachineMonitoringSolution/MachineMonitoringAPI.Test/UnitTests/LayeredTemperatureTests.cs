@@ -1,5 +1,5 @@
-﻿using System.Data;
-using MachineMonitoringService.Services;
+﻿using MachineMonitoringService.Services;
+using System.Data;
 
 namespace MachineMonitoring.Tests.UnitTests
 {

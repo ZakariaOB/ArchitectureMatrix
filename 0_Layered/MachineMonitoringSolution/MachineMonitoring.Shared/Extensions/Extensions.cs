@@ -16,8 +16,7 @@
             }
 
             // If our IEnumerable is a list for example the count will be better
-            ICollection<T> collection = enumerable as ICollection<T>;
-            if (collection != null)
+            if (enumerable is ICollection<T> collection)
             {
                 return collection.Count == 0;
             }
