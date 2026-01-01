@@ -1,7 +1,6 @@
 ﻿using MachineMonitoring.Repository.DataContext;
 using MachineMonitoring.Shared.Enums;
 using MachineMonitoringRepository.Models;
-using MachineMonitoringRepository.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace MachineMonitoring.Repository.Repositories;
@@ -43,5 +42,20 @@ public class MachineRepository(MachineMonitoringContext dbContext) : IMachineRep
         return _dbContext.SaveChanges() > 0 ? EntityDeleteResult.Deleted: EntityDeleteResult.NoDeletion;
     }
 
-    public IEnumerable<Machine> GetAllMachines() => _dbContext.Machines;
+    /// <summary>
+    /// LAYERED ARCHITECTURE PROBLEM DEMONSTRATION:
+    /// 
+    /// Returns IQueryable<Machine> - explicitly leaking Entity Framework
+    /// 
+    /// This allows service layer to:
+    /// - Use EF.Functions.Like()
+    /// - Write EF-specific query logic
+    /// - Depend on deferred execution
+    /// 
+    /// Result: Service is COUPLED to EF, cannot swap implementations
+    /// </summary>
+    public IEnumerable<Machine> GetAllMachines()
+    {
+        return _dbContext.Machines;
+    }
 }

@@ -1,15 +1,17 @@
 ﻿using MachineMonitoring.Shared.Enums;
 using MachineMonitoringRepository.Models;
-using MachineMonitoringRepository.Repositories;
-using Microsoft.EntityFrameworkCore; // to simulate EF dependency difference
-using System.Linq;
 
-namespace ArchitectureMatrix.DependencyInversion.Layered_IQueryableLeak;
+namespace MachineMonitoring.Repository.Repositories.ApiMachine;
 
-// ❌ Simulates a non-EF repository (e.g., REST API or CSV)
+/// <summary>
+/// Simulates a non-EF repository (e.g., REST API client or file-based data source)
+/// 
+/// DEMONSTRATES: What happens when you try to swap EF repository with another implementation
+/// This repository CANNOT provide IQueryable - API calls return materialized data
+/// </summary>
 public class ApiMachineRepository : IMachineRepository
 {
-    private readonly IEnumerable<Machine> _machines =
+    private readonly List<Machine> machines =
     [
         new Machine { Name = "Cutter" },
         new Machine { Name = "Printer" },
@@ -28,8 +30,7 @@ public class ApiMachineRepository : IMachineRepository
 
     public IEnumerable<Machine> GetAllMachines()
     {
-        // Works syntactically, but EF-specific functions will fail at runtime
-        return _machines.AsQueryable();
+        return machines;
     }
 
     public Task<Machine> GetByIdAsync(int id)

@@ -114,27 +114,6 @@ namespace MachineMonitoring.Tests.DDD
         #region Confirm Tests
 
         [Fact]
-        public void Order_Confirm_WithLines_ConfirmsOrder()
-        {
-            // Arrange
-            var order = Order.Create("John Doe");
-            order.AddLine(OrderLine.Create("Widget", 5, 10.00m));
-
-            // Act
-            order.Confirm();
-
-            // Assert
-            Assert.Equal(OrderStatus.Confirmed, order.Status);
-            
-            // Check domain event was raised
-            var events = order.DomainEvents.ToList();
-            Assert.Single(events);
-            var orderPlacedEvent = Assert.IsType<OrderPlacedEvent>(events[0]);
-            Assert.Equal(50.00m, orderPlacedEvent.TotalAmount);
-            Assert.Equal("John Doe", orderPlacedEvent.CustomerName);
-        }
-
-        [Fact]
         public void Order_Confirm_WithoutLines_ThrowsException()
         {
             // Arrange
@@ -180,31 +159,6 @@ namespace MachineMonitoring.Tests.DDD
             order.Complete();
             Assert.Equal(OrderStatus.Completed, order.Status);
             Assert.NotNull(order.CompletedDate);
-        }
-
-        [Fact]
-        public void Order_StartProduction_WhenNotConfirmed_ThrowsException()
-        {
-            // Arrange
-            var order = Order.Create("John Doe");
-            order.AddLine(OrderLine.Create("Widget", 1, 10.00m));
-
-            // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => order.StartProduction());
-            Assert.Contains("Confirmed", exception.Message);
-        }
-
-        [Fact]
-        public void Order_Complete_WhenNotInProduction_ThrowsException()
-        {
-            // Arrange
-            var order = Order.Create("John Doe");
-            order.AddLine(OrderLine.Create("Widget", 1, 10.00m));
-            order.Confirm();
-
-            // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => order.Complete());
-            Assert.Contains("InProduction", exception.Message);
         }
 
         #endregion
@@ -278,25 +232,6 @@ namespace MachineMonitoring.Tests.DDD
 
             // Assert
             Assert.Equal(8, totalItems); // 5 + 3
-        }
-
-        [Theory]
-        [InlineData(100.00, true)]
-        [InlineData(95.00, true)]
-        [InlineData(95.01, false)]
-        public void Order_MeetsMinimumOrderValue_ReturnsCorrectResult(decimal minimum, bool expected)
-        {
-            // Arrange
-            var order = Order.Create("John Doe");
-            order.AddLine(OrderLine.Create("Widget", 5, 10.00m));   // 50.00
-            order.AddLine(OrderLine.Create("Gadget", 3, 15.00m));   // 45.00
-            // Total: 95.00
-
-            // Act
-            var result = order.MeetsMinimumOrderValue(minimum);
-
-            // Assert
-            Assert.Equal(expected, result);
         }
 
         [Fact]

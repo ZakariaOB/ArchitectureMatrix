@@ -9,7 +9,10 @@ public class FakeMaintenanceRepository : IMaintenanceRepository
 
     public Task SaveAsync(MaintenanceTask task)
     {
-        if (!Tasks.Contains(task)) Tasks.Add(task);
+        if (!Tasks.Contains(task))
+        {
+            Tasks.Add(task);
+        }
         return Task.CompletedTask;
     }
 }

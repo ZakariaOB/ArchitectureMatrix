@@ -1,6 +1,5 @@
 ﻿using MachineMonitoring.Repository.DataContext;
 using MachineMonitoring.Repository.Repositories;
-using MachineMonitoringRepository.Repositories;
 using MachineMonitoringService.Services;
 using Microsoft.EntityFrameworkCore;
 

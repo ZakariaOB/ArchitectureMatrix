@@ -1,10 +1,9 @@
-﻿
-using MachineMonitoring.Repository.DataContext;
+﻿using MachineMonitoring.Repository.DataContext;
 using Microsoft.EntityFrameworkCore;
 
 namespace MachineMonitoring.Repository.Repositories;
 
-public class MaintenanceRepository(MachineMonitoringContext db)
+public class MaintenanceRepository(MachineMonitoringContext db) : IMaintenanceRepository
 {
     private readonly MachineMonitoringContext _db = db;
 

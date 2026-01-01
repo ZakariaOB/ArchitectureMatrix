@@ -2,8 +2,8 @@
 
 public class RescheduleMaintenanceService
 {
-    private readonly MaintenanceRepository _repo;
-    public RescheduleMaintenanceService(MaintenanceRepository repo) => _repo = repo;
+    private readonly IMaintenanceRepository _repo;
+    public RescheduleMaintenanceService(IMaintenanceRepository repo) => _repo = repo;
 
     public async Task ExecuteAsync(DateTime currentDate)
     {
